@@ -1,5 +1,5 @@
 var movies = [
-    new Movie("Wicked", "Movie Musical", "Jon M. Chu", "https://www.wickedmovie.com/synopsis/",
+    new Movie("Wicked", "Jon M. Chu", "Movie Musical", "https://www.wickedmovie.com/synopsis/",
         "Wicked Movie Synopsis", 0
     )
 ];
