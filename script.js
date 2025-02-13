@@ -4,33 +4,40 @@ var movies = [
     )
 ];
 
-onload = () => {
-    for (var i = 0; i < movies.length; i++) {
-        displayMovieInTable(movies[i]);
-    }
+console.log(movies);
+for (var i = 0; i < movies.length; i++) {
+    displayMovieInTable(movies[i]);
 }
+console.log(document.getElementsByTagName("td"));
+
 
 function displayMovieInTable(movie) {
     if ((!(movie instanceof Movie))) {
         throw new TypeError("Parameter must be of type Movie.");
     }
-    var movieRow = document.createElement("tr", {class: "movie-rows"});
+    var movieRow = document.createElement("tr");
+    movieRow.class = "movie-rows";
     for (var i = 0; i < 5; i++) {
-        var tableData = document.createElement("td", {class: `movie-${movies.indexOf(movie)}`});
+        var tableData = document.createElement("td");
+        console.log(`movie-${movies.indexOf(movie)}`);
+        tableData.class = `movie-${movies.indexOf(movie)}`;
         var movieAttributeData = getMovieAttribute(movie, i);
+        console.log(movieAttributeData);
         (movieAttributeData instanceof HTMLAnchorElement) ? tableData.insertAdjacentElement("afterbegin", movieAttributeData) : tableData.insertAdjacentText("afterbegin", movieAttributeData);
     }
-    var movieRowData = document.getElementsByClassName(`movie-${movies.indexOf(movie)}`)
+    var movieRowData = document.getElementsByClassName(`movie-${movies.indexOf(movie)}`);
+    console.log(movieRowData);
     for (var i = 0; i < movieRowData.length; i++) {
         movieRow.insertAdjacentElement("beforeend", movieRowData[i]);
     }
-    document.getElementsByTagName("thead").insertAdjacentElement("beforeend", movieRow);
+    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", movieRow);
 }
 
 function getMovieAttribute(movie, number) {
     if ((!(movie instanceof Movie))) {
         throw new TypeError("Parameter must be of type Movie.");
     }
+    console.log("adding movie info to table...");
     switch (number) {
         case 0:
             return movie.title;
