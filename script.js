@@ -16,18 +16,17 @@ for (var i = 0; i < movies.length; i++) {
 }
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
-    var newRow = document.createElement("tr");
+    var newRow = document.createElement("form");
     newRow.className = "movie-rows";
-    var movieEntryForm = document.createElement("form");
-    newRow.insertAdjacentElement("beforeend", movieEntryForm);
     for (var i = 0; i < 6; i++) {
         var newCell = document.createElement("td");
         var cellInput = document.createElement("input");
         cellInput.type = (i == 5) ? "submit" : "text";
+        cellInput.required = (i < 2);
         newCell.insertAdjacentElement("afterbegin", cellInput);
         newRow.insertAdjacentElement("beforeend", newCell);
     }
-    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+    document.getElementsByTagName("table")[0].insertAdjacentElement("afterend", newRow);
 });
 
 
