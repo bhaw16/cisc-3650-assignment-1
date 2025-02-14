@@ -18,13 +18,13 @@ console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
     var newRow = document.createElement("tr");
     newRow.className = "movie-rows";
-    for (var i = 0; i < 5; i++) {
+    var movieEntryForm = document.createElement("form");
+    newRow.insertAdjacentElement("beforeend", movieEntryForm);
+    for (var i = 0; i < 6; i++) {
         var newCell = document.createElement("td");
-        if (i < 2) {
-            var cellInput = document.createElement("input");
-            cellInput.type = "text";
-            newCell.insertAdjacentElement("afterbegin", cellInput);
-        }
+        var cellInput = document.createElement("input");
+        cellInput.type = (i == 5) ? "submit" : "text";
+        newCell.insertAdjacentElement("afterbegin", cellInput);
         newRow.insertAdjacentElement("beforeend", newCell);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
