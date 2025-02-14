@@ -1,6 +1,12 @@
 var movies = [
-    new Movie("Wicked", "Jon M. Chu", "Movie Musical", "https://www.wickedmovie.com/synopsis/",
+    new Movie("Wicked", "Movie Musical", "Jon M. Chu", "https://www.wickedmovie.com/synopsis/",
         "Wicked Movie Synopsis", 0
+    ),
+    new Movie("In the Heights", "Movie Musical", "Jon M. Chu", "https://www.warnerbros.com/movies/heights",
+        "Warner Bros' In the Heights Movie Page", 0
+    ),
+    new Movie("Crazy Rich Asians", "Romantic Comedy", "Jon M. Chu", "https://www.imdb.com/title/tt3104988/",
+        "Crazy Rich Asians IMDb Page", 0
     )
 ];
 
@@ -9,6 +15,20 @@ for (var i = 0; i < movies.length; i++) {
     displayMovieInTable(movies[i]);
 }
 console.log(document.getElementsByTagName("td"));
+document.getElementById("add-movie").addEventListener("click", () => {
+    var newRow = document.createElement("tr");
+    newRow.className = "movie-rows";
+    for (var i = 0; i < 5; i++) {
+        var newCell = document.createElement("td");
+        if (i < 2) {
+            var cellInput = document.createElement("input");
+            cellInput.type = "text";
+            newCell.insertAdjacentElement("afterbegin", cellInput);
+        }
+        newRow.insertAdjacentElement("beforeend", newCell);
+    }
+    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+});
 
 
 function displayMovieInTable(movie) {
@@ -27,12 +47,6 @@ function displayMovieInTable(movie) {
         (movieAttributeData instanceof HTMLAnchorElement) ? tableData.insertAdjacentElement("afterbegin", movieAttributeData) : tableData.insertAdjacentText("afterbegin", movieAttributeData);
         movieRow.insertAdjacentElement("beforeend", tableData);
     }
-    /*var movieRowData = document.getElementsByClassName(`movie-${movies.indexOf(movie)}`);
-    console.log(document.getElementsByClassName(`movie-${movies.indexOf(movie)}`));
-    console.log(movieRowData);
-    for (var i = 0; i < movieRowData.length; i++) {
-        movieRow.insertAdjacentElement("beforeend", movieRowData[i]);
-    }*/
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", movieRow);
 }
 
@@ -45,9 +59,9 @@ function getMovieAttribute(movie, number) {
         case 0:
             return movie.title;
         case 1:
-            return movie.director;
-        case 2:
             return movie.genre;
+        case 2:
+            return movie.director;
         case 3:
             return movie.hyperlink;
         default:
