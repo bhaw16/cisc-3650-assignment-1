@@ -14,6 +14,7 @@ console.log(movies);
 for (var i = 0; i < movies.length; i++) {
     displayMovieInTable(movies[i]);
 }
+getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
     var newRow = document.createElement("tr");
@@ -67,4 +68,19 @@ function getMovieAttribute(movie, number) {
         default:
             return movie.getWatchStatusString();
     }
+}
+
+async function getMovieData(movie) {
+    if ((!(movie instanceof Movie))) {
+        throw new TypeError("Parameter must be of type Movie.");
+    }
+    var titleString = movie.title;
+    titleString.trim();
+    titleString.replaceAll(" ", "+");
+    titleString.replaceAll(/[.,:!?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie`).then(
+        (response) => response.json()
+    ).then(
+        (json) => console.log(json)
+    );
 }
