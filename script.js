@@ -1,15 +1,7 @@
-var movies = [
-    /*new Movie("Wicked", "Movie Musical", "Jon M. Chu", "https://www.wickedmovie.com/synopsis/",
-        "Wicked Movie Synopsis", 0
-    ),
-    new Movie("In the Heights", "Movie Musical", "Jon M. Chu", "https://www.warnerbros.com/movies/heights",
-        "Warner Bros' In the Heights Movie Page", 0
-    ),
-    new Movie("Crazy Rich Asians", "Romantic Comedy", "Jon M. Chu", "https://www.imdb.com/title/tt3104988/",
-        "Crazy Rich Asians IMDb Page", 0
-    )*/
-];
+var movies = [];
 getMovieFromTitle("Wicked", "Movie Musical");
+getMovieFromTitle("In the Heights", "Movie Musical");
+getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
 
 console.log(movies);
 for (var i = 0; i < movies.length; i++) {
