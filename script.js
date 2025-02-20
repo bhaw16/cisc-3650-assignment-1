@@ -39,14 +39,14 @@ function displayMovieInTable(movie) {
     }
     var movieRow = document.createElement("tr");
     movieRow.className = "movie-rows";
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < 6; i++) {
         var tableData = document.createElement("td");
         console.log(`movie-${movies.indexOf(movie)}`);
         tableData.className = `movie-${movies.indexOf(movie)}`;
         var movieAttributeData = getMovieAttribute(movie, i);
         console.log(movieAttributeData);
         console.log(tableData);
-        (movieAttributeData instanceof HTMLAnchorElement) ? tableData.insertAdjacentElement("afterbegin", movieAttributeData) : tableData.insertAdjacentText("afterbegin", movieAttributeData);
+        (movieAttributeData instanceof HTMLImageElement) ? tableData.insertAdjacentElement("afterbegin", movieAttributeData) : tableData.insertAdjacentText("afterbegin", movieAttributeData);
         movieRow.insertAdjacentElement("beforeend", tableData);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", movieRow);
@@ -67,6 +67,8 @@ function getMovieAttribute(movie, number) {
         case 3:
             return movie.plot;
             //return movie.hyperlink;
+        case 4:
+            return movie.image;
         default:
             return movie.getWatchStatusString();
     }
@@ -98,10 +100,10 @@ async function getMovieFromTitle(title, genre) {
         (response) => response.json()
     ).then(
         (json) => {
-            /*console.log(json.Director);
+            console.log(json.Director);
             console.log(json.Plot);
-            console.log(json.Poster);*/
-            movies.push(new Movie(title, genre, json.Director, json.Plot, 0));
+            console.log(json.Poster);
+            movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
             displayMovieInTable(movies[movies.length - 1]);
         }
     );
