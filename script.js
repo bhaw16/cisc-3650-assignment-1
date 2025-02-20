@@ -1,5 +1,5 @@
 var movies = [
-    new Movie("Wicked", "Movie Musical", "Jon M. Chu", "https://www.wickedmovie.com/synopsis/",
+    /*new Movie("Wicked", "Movie Musical", "Jon M. Chu", "https://www.wickedmovie.com/synopsis/",
         "Wicked Movie Synopsis", 0
     ),
     new Movie("In the Heights", "Movie Musical", "Jon M. Chu", "https://www.warnerbros.com/movies/heights",
@@ -7,14 +7,15 @@ var movies = [
     ),
     new Movie("Crazy Rich Asians", "Romantic Comedy", "Jon M. Chu", "https://www.imdb.com/title/tt3104988/",
         "Crazy Rich Asians IMDb Page", 0
-    )
+    )*/
 ];
+getMovieFromTitle("Wicked", "Movie Musical");
 
 console.log(movies);
 for (var i = 0; i < movies.length; i++) {
     displayMovieInTable(movies[i]);
 }
-getMovieData(movies[0]);
+//getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
     var newRow = document.createElement("tr");
@@ -64,7 +65,8 @@ function getMovieAttribute(movie, number) {
         case 2:
             return movie.director;
         case 3:
-            return movie.hyperlink;
+            return movie.plot;
+            //return movie.hyperlink;
         default:
             return movie.getWatchStatusString();
     }
@@ -78,9 +80,29 @@ async function getMovieData(movie) {
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:!?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie`).then(
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => console.log(json)
+    );
+}
+
+async function getMovieFromTitle(title, genre) {
+    if (typeof(title) != "string" || typeof(genre) != "string") {
+        throw new TypeError("Parameters must be a string.");
+    }
+    title.trim();
+    title.replaceAll(" ", "+");
+    title.replaceAll(/[.,:!?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${title}&type=movie&plot=full`).then(
+        (response) => response.json()
+    ).then(
+        (json) => {
+            /*console.log(json.Director);
+            console.log(json.Plot);
+            console.log(json.Poster);*/
+            movies.push(new Movie(title, genre, json.Director, json.Plot, 0));
+            displayMovieInTable(movies[movies.length - 1]);
+        }
     );
 }

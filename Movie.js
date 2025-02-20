@@ -1,8 +1,8 @@
 class Movie {
-    constructor(title, genre, director, moreInfoLink, hyperLinkText, watchStatus) {
+    constructor(title, genre, director, /*moreInfoLink,*/ plot, watchStatus) {
         if (typeof(title) != "string" || typeof(genre) != "string"
-        || typeof(director) != "string" || typeof(moreInfoLink) != "string"
-        || typeof(hyperLinkText) != "string") {
+        || typeof(director) != "string"/* || typeof(moreInfoLink) != "string"*/
+        || typeof(plot) != "string") {
             throw new TypeError("All parameters must be strings.");
         }
         if ((!(Number.isInteger(watchStatus)))) {
@@ -14,9 +14,10 @@ class Movie {
         this.title = title;
         this.genre = genre;
         this.director = director;
-        this.hyperlink = document.createElement("a");
+        this.plot = plot;
+        /*this.hyperlink = document.createElement("a");
         this.hyperlink.href = moreInfoLink;
-        this.hyperlink.insertAdjacentText("afterbegin", hyperLinkText);
+        this.hyperlink.insertAdjacentText("afterbegin", hyperLinkText);*/
         this.watchStatus = watchStatus;
     }
 
