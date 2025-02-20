@@ -2,6 +2,7 @@ var movies = [];
 getMovieFromTitle("Wicked", "Movie Musical");
 getMovieFromTitle("In the Heights", "Movie Musical");
 getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
+getMovieFromTitle("Sailor Moon SuperS: The Movie", "Mahou Shojo");
 
 console.log(movies);
 for (var i = 0; i < movies.length; i++) {
