@@ -97,6 +97,7 @@ async function getMovieFromTitle(title, genre) {
             console.log(json.Plot);
             console.log(json.Poster);
             movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
+            console.log(movies);
             displayMovieInTable(movies[movies.length - 1]);
         }
     );
