@@ -1,8 +1,5 @@
 var movies = [];
-getMovieFromTitle("Wicked", "Movie Musical");
-getMovieFromTitle("In the Heights", "Movie Musical");
-getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
-getMovieFromTitle("Sailor Moon SuperS: The Movie", "Mahou Shojo");
+loadMovies();
 
 console.log(movies);
 for (var i = 0; i < movies.length; i++) {
@@ -13,8 +10,6 @@ console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
     var newRow = document.createElement("tr");
     newRow.className = "movie-rows";
-    var movieEntryForm = document.createElement("form");
-    newRow.insertAdjacentElement("beforeend", movieEntryForm);
     for (var i = 0; i < 6; i++) {
         var newCell = document.createElement("td");
         var cellInput = document.createElement("input");
@@ -100,5 +95,14 @@ async function getMovieFromTitle(title, genre) {
             console.log(movies);
             displayMovieInTable(movies[movies.length - 1]);
         }
+    ).catch(
+        (error) => console.log(error)
     );
+}
+
+async function loadMovies() {
+    await getMovieFromTitle("Wicked", "Movie Musical");
+    await getMovieFromTitle("In the Heights", "Movie Musical");
+    await getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
+    await getMovieFromTitle("Sailor Moon SuperS: The Movie", "Mahou Shojo");
 }
