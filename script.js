@@ -92,7 +92,8 @@ function addMovieForm() {
         }
         else if (i == 5) {
             for (var j = 0; j < 3; j++) {
-                formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" name=\"watch-status\" value=\"${j}\" form=\"movie-form\">`);
+                formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" id=\"${getRadioId(j)}\" name=\"watch-status\" value=\"${j}\" form=\"movie-form\">`);
+                formCell.insertAdjacentHTML("beforeend", `<label for=\"${getRadioId(j)}\" form=\"movie-form\">${Movie.getStaticWatchStatusString(j)}</label>`);
                 /*
                 var cellInput = document.createElement("input");
                 cellInput.type = "radio";
@@ -114,6 +115,23 @@ function addMovieForm() {
         newRow.insertAdjacentElement("beforeend", formCell);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+}
+
+function getRadioId(num) {
+    if ((!(Number.isInteger(num)))) {
+        throw new TypeError("num must be an integer.");
+    }
+    if (num < 0 || num > 2) {
+        throw new RangeError("num must be from 0-2, inclusive.");
+    }
+    switch(num) {
+        case 0:
+            return "NW";
+        case 1:
+            return "CW";
+        default:
+            return "W";
+    }
 }
 
 async function getMovieData(movie) {

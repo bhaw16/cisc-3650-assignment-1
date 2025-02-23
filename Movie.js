@@ -34,4 +34,21 @@ class Movie {
                 return "Finished watching";
         }
     }
+
+    static getStaticWatchStatusString(watchStatus) {
+        if ((!(Number.isInteger(watchStatus)))) {
+            throw new TypeError("Watch status must be an integer.");
+        }
+        if (watchStatus < 0 || watchStatus > 2) {
+            throw new RangeError("Watch status must be from 0-2, inclusive.");
+        }
+        switch(watchStatus) {
+            case 0:
+                return "not watched";
+            case 1:
+                return "currently watching";
+            default:
+                return "Finished watching";
+        }
+    }
 }
