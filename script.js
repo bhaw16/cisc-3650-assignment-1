@@ -13,7 +13,7 @@ document.getElementById("add-movie").addEventListener("click", () => {
     try {
     if (canAddMovie) {
         canAddMovie = false;
-        addMovieForm()
+        addMovieForm();
     }
     else {
         throw new Error("Finish adding this movie before adding another one.");
@@ -22,6 +22,9 @@ document.getElementById("add-movie").addEventListener("click", () => {
     catch(err) {
         console.log(err.message);
     }
+});
+document.getElementById("add-movie").addEventListener("mouseover", () => {
+    (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
 
     /*var newRow = document.createElement("tr");
