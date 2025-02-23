@@ -142,6 +142,7 @@ function addMovieForm() {
         newRow.insertAdjacentElement("beforeend", formCell);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+    scrollTo(0, getFormX());
 }
 
 function getRadioId(num) {
@@ -236,4 +237,8 @@ async function loadMovies() {
     await getMovieFromTitle("In the Heights", "Movie Musical");
     await getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
     await getMovieFromTitle("Sailor Moon SuperS: The Movie", "Mahou Shojo");
+}
+
+function getFormX() {
+    return document.getElementsByTagName("h1")[0].offsetTop + document.getElementsByTagName("table")[0].offsetTop + document.getElementById("add-movie-form").offsetTop;
 }
