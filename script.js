@@ -1,4 +1,4 @@
-var movies = [];
+var movies = [], canAddMovie = true;
 loadMovies();
 
 console.log(movies);
@@ -8,7 +8,21 @@ for (var i = 0; i < movies.length; i++) {
 //getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
-    var newRow = document.createElement("tr");
+    try {
+    if (canAddMovie) {
+        canAddMovie = false;
+        addMovieForm()
+    }
+    else {
+        throw new Error("Finish adding this movie before adding another one.");
+    }
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+});
+
+    /*var newRow = document.createElement("tr");
     newRow.className = "movie-rows";
     for (var i = 0; i < 6; i++) {
         var newCell = document.createElement("td");
@@ -17,8 +31,8 @@ document.getElementById("add-movie").addEventListener("click", () => {
         newCell.insertAdjacentElement("afterbegin", cellInput);
         newRow.insertAdjacentElement("beforeend", newCell);
     }
-    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
-});
+    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);*/
+
 
 
 function displayMovieInTable(movie) {
@@ -62,6 +76,54 @@ function getMovieAttribute(movie, number) {
     }
 }
 
+function addMovieForm() {
+    var newRow = document.createElement("tr");
+    for (var i = 0; i < 7; i++) {
+        var formCell = document.createElement("td");
+        if (i < 2) {
+            var cellInput = document.createElement("input");
+            cellInput.type = "text";
+            cellInput.form = document.getElementById("movie-form");
+            formCell.insertAdjacentElement("beforeend", cellInput);
+        }
+        else if (i == 5) {
+            for (var j = 0; j < 3; j++) {
+                var cellInput = document.createElement("input");
+                cellInput.type = "radio";
+                cellInput.name = "watch-status";
+                cellInput.value = getRadioLabel(j);
+                cellInput.form = document.getElementById("movie-form");
+                formCell.insertAdjacentElement("beforeend", cellInput);
+            }
+        }
+        else if (i == 6) {
+            var cellInput = document.createElement("input");
+            cellInput.type = "submit";
+            cellInput.form = document.getElementById("movie-form");
+            formCell.insertAdjacentElement("beforeend", cellInput);
+        }
+        newRow.insertAdjacentElement("beforeend", formCell);
+    }
+    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+}
+
+function getRadioLabel(num) {
+    if ((!(Number.isInteger(num)))) {
+        throw new TypeError("number must be an integer.");
+    }
+    if (num < 0 || num > 2) {
+        throw new RangeError("number must be from 0-2, inclusive.");
+    }
+    switch(num) {
+        case 0:
+            return "not watched";
+        case 1:
+            return "currently watching";
+        default:
+            return "watched";
+    }
+}
+
 async function getMovieData(movie) {
     if ((!(movie instanceof Movie))) {
         throw new TypeError("Parameter must be of type Movie.");
@@ -81,10 +143,11 @@ async function getMovieFromTitle(title, genre) {
     if (typeof(title) != "string" || typeof(genre) != "string") {
         throw new TypeError("Parameters must be a string.");
     }
-    title.trim();
-    title.replaceAll(" ", "+");
-    title.replaceAll(/[.,:!?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${title}&type=movie&plot=full`).then(
+    var titleString = title;
+    titleString.trim();
+    titleString.replaceAll(" ", "+");
+    titleString.replaceAll(/[.,:!?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => {
@@ -92,6 +155,36 @@ async function getMovieFromTitle(title, genre) {
             console.log(json.Plot);
             console.log(json.Poster);
             movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
+            console.log(movies);
+            displayMovieInTable(movies[movies.length - 1]);
+        }
+    ).catch(
+        (error) => console.log(error)
+    );
+}
+
+async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
+    if (typeof(title) != "string" || typeof(genre) != "string") {
+        throw new TypeError("Parameters must be a string.");
+    }
+    if ((!(Number.isInteger(watchStatus)))) {
+        throw new TypeError("Watch status must be an integer.");
+    }
+    if (watchStatus < 0 || watchStatus > 2) {
+        throw new RangeError("Watch status must be from 0-2, inclusive.");
+    }
+    var titleString = title;
+    titleString.trim();
+    titleString.replaceAll(" ", "+");
+    titleString.replaceAll(/[.,:!?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
+        (response) => response.json()
+    ).then(
+        (json) => {
+            console.log(json.Director);
+            console.log(json.Plot);
+            console.log(json.Poster);
+            movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus));
             console.log(movies);
             displayMovieInTable(movies[movies.length - 1]);
         }
