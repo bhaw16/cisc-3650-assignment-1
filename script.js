@@ -26,6 +26,28 @@ document.getElementById("add-movie").addEventListener("click", () => {
 document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
+document.getElementById("movie-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    var title, genre, watchStatus;
+    if (document.getElementById("title").value == "") 
+        throw new Error("You must enter a title.");
+    else 
+        title = document.getElementById("title").value;
+    if (document.getElementById("genre").value == "") 
+        throw new Error("You must enter a genre.");
+    else
+        genre = document.getElementById("genre").value;
+    var radioButtons = document.getElementsByName("watch-status");
+    for (var i = 0; i < radioButtons.length; i++) {
+        if (radioButtons[i].checked)
+            watchStatus = Number.parseInt(radioButtons[i].value);
+    }
+    if (watchStatus == undefined)
+        throw new Error("You must specify a watch status.");
+    document.getElementById("add-movie-form").remove();
+    getMovieFromTitle_WatchStatus(title, genre, watchStatus);
+    canAddMovie = true;
+})
 
     /*var newRow = document.createElement("tr");
     newRow.className = "movie-rows";
@@ -83,10 +105,12 @@ function getMovieAttribute(movie, number) {
 
 function addMovieForm() {
     var newRow = document.createElement("tr");
+    newRow.id = "add-movie-form";
     for (var i = 0; i < 7; i++) {
         var formCell = document.createElement("td");
         if (i < 2) {
-            formCell.insertAdjacentHTML("beforeend", "<input type=\"text\" form=\"movie-form\">");
+            var textId = (i == 0) ? "title" : "genre";
+            formCell.insertAdjacentHTML("beforeend", `<input type=\"text\" id=\"${textId}\" form=\"movie-form\">`);
             /*
             var cellInput = document.createElement("input");
             cellInput.type = "text";
@@ -142,6 +166,7 @@ async function getMovieData(movie) {
         throw new TypeError("Parameter must be of type Movie.");
     }
     var titleString = movie.title;
+    titleString.toLowerCase();
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:!?]/g, "%3A");
