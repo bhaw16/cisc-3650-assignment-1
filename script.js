@@ -1,4 +1,6 @@
-var movies = [], canAddMovie = true;
+var movies = [];
+//var movieForm = "<tr><td><input type=\"text\" form=\"movie-form\"></td><td><input type=\"text\" form=\"movie-form\"></td><td></td><td></td><td></td></tr>";
+var canAddMovie = true;
 loadMovies();
 
 console.log(movies);
@@ -81,47 +83,37 @@ function addMovieForm() {
     for (var i = 0; i < 7; i++) {
         var formCell = document.createElement("td");
         if (i < 2) {
+            formCell.insertAdjacentHTML("beforeend", "<input type=\"text\" form=\"movie-form\">");
+            /*
             var cellInput = document.createElement("input");
             cellInput.type = "text";
             cellInput.form = document.getElementById("movie-form");
-            formCell.insertAdjacentElement("beforeend", cellInput);
+            formCell.insertAdjacentElement("beforeend", cellInput);*/
         }
         else if (i == 5) {
             for (var j = 0; j < 3; j++) {
+                formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" name=\"watch-status\" value=\"${j}\" form=\"movie-form\">`);
+                /*
                 var cellInput = document.createElement("input");
                 cellInput.type = "radio";
                 cellInput.name = "watch-status";
-                cellInput.value = getRadioLabel(j);
+                cellInput.value = j;
                 cellInput.form = document.getElementById("movie-form");
                 formCell.insertAdjacentElement("beforeend", cellInput);
+                */
             }
         }
         else if (i == 6) {
+            formCell.insertAdjacentHTML("beforeend", "<input type=\"submit\" form=\"movie-form\">");
+            /*
             var cellInput = document.createElement("input");
             cellInput.type = "submit";
             cellInput.form = document.getElementById("movie-form");
-            formCell.insertAdjacentElement("beforeend", cellInput);
+            formCell.insertAdjacentElement("beforeend", cellInput);*/
         }
         newRow.insertAdjacentElement("beforeend", formCell);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
-}
-
-function getRadioLabel(num) {
-    if ((!(Number.isInteger(num)))) {
-        throw new TypeError("number must be an integer.");
-    }
-    if (num < 0 || num > 2) {
-        throw new RangeError("number must be from 0-2, inclusive.");
-    }
-    switch(num) {
-        case 0:
-            return "not watched";
-        case 1:
-            return "currently watching";
-        default:
-            return "watched";
-    }
 }
 
 async function getMovieData(movie) {
