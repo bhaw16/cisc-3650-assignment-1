@@ -185,17 +185,25 @@ async function getMovieFromTitle(title, genre) {
     var titleString = title;
     titleString.trim();
     titleString.replaceAll(" ", "+");
-    titleString.replaceAll(/[.,:!?]/g, "%3A");
+    titleString.replaceAll(/[.,:?]/g, "%3A");
     await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => {
-            console.log(json.Director);
-            console.log(json.Plot);
-            console.log(json.Poster);
-            movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
-            console.log(movies);
-            displayMovieInTable(movies[movies.length - 1]);
+            console.log(json.Response);
+            if (json.Response == "True") {
+                console.log(json);
+                console.log(json.Director);
+                console.log(json.Plot);
+                console.log(json.Poster);
+                movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
+                console.log(movies);
+                displayMovieInTable(movies[movies.length - 1]);
+            }
+            else {
+                console.log(json);
+                throw new Error(json.Error);
+            }
         }
     ).catch(
         (error) => console.log(error)
@@ -215,17 +223,25 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
     var titleString = title;
     titleString.trim();
     titleString.replaceAll(" ", "+");
-    titleString.replaceAll(/[.,:!?]/g, "%3A");
+    titleString.replaceAll(/[.,:?]/g, "%3A");
     await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => {
-            console.log(json.Director);
-            console.log(json.Plot);
-            console.log(json.Poster);
-            movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus));
-            console.log(movies);
-            displayMovieInTable(movies[movies.length - 1]);
+            console.log(json.Response);
+            if (json.Response == "True") {
+                console.log(json);
+                console.log(json.Director);
+                console.log(json.Plot);
+                console.log(json.Poster);
+                movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus));
+                console.log(movies);
+                displayMovieInTable(movies[movies.length - 1]);
+            }
+            else {
+                console.log(json);
+                throw new Error(json.Error); 
+            }
         }
     ).catch(
         (error) => console.log(error)
