@@ -1,8 +1,7 @@
 var movies = [];
-getMovieFromTitle("Wicked", "Movie Musical");
-getMovieFromTitle("In the Heights", "Movie Musical");
-getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
-getMovieFromTitle("Sailor Moon SuperS: The Movie", "Mahou Shojo");
+//var movieForm = "<tr><td><input type=\"text\" form=\"movie-form\"></td><td><input type=\"text\" form=\"movie-form\"></td><td></td><td></td><td></td></tr>";
+var canAddMovie = true;
+loadMovies();
 
 console.log(movies);
 for (var i = 0; i < movies.length; i++) {
@@ -11,10 +10,47 @@ for (var i = 0; i < movies.length; i++) {
 //getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
-    var newRow = document.createElement("tr");
+    try {
+    if (canAddMovie) {
+        canAddMovie = false;
+        addMovieForm();
+    }
+    else {
+        throw new Error("Finish adding this movie before adding another one.");
+    }
+    }
+    catch(err) {
+        console.log(err.message);
+    }
+});
+document.getElementById("add-movie").addEventListener("mouseover", () => {
+    (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
+});
+document.getElementById("movie-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    var title, genre, watchStatus;
+    if (document.getElementById("title").value == "") 
+        throw new Error("You must enter a title.");
+    else 
+        title = document.getElementById("title").value;
+    if (document.getElementById("genre").value == "") 
+        throw new Error("You must enter a genre.");
+    else
+        genre = document.getElementById("genre").value;
+    var radioButtons = document.getElementsByName("watch-status");
+    for (var i = 0; i < radioButtons.length; i++) {
+        if (radioButtons[i].checked)
+            watchStatus = Number.parseInt(radioButtons[i].value);
+    }
+    if (watchStatus == undefined)
+        throw new Error("You must specify a watch status.");
+    document.getElementById("add-movie-form").remove();
+    getMovieFromTitle_WatchStatus(title, genre, watchStatus);
+    canAddMovie = true;
+})
+
+    /*var newRow = document.createElement("tr");
     newRow.className = "movie-rows";
-    var movieEntryForm = document.createElement("form");
-    newRow.insertAdjacentElement("beforeend", movieEntryForm);
     for (var i = 0; i < 6; i++) {
         var newCell = document.createElement("td");
         var cellInput = document.createElement("input");
@@ -22,8 +58,8 @@ document.getElementById("add-movie").addEventListener("click", () => {
         newCell.insertAdjacentElement("afterbegin", cellInput);
         newRow.insertAdjacentElement("beforeend", newCell);
     }
-    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
-});
+    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);*/
+
 
 
 function displayMovieInTable(movie) {
@@ -67,11 +103,71 @@ function getMovieAttribute(movie, number) {
     }
 }
 
+function addMovieForm() {
+    var newRow = document.createElement("tr");
+    newRow.id = "add-movie-form";
+    for (var i = 0; i < 7; i++) {
+        var formCell = document.createElement("td");
+        if (i < 2) {
+            var textId = (i == 0) ? "title" : "genre";
+            formCell.insertAdjacentHTML("beforeend", `<input type=\"text\" id=\"${textId}\" form=\"movie-form\">`);
+            /*
+            var cellInput = document.createElement("input");
+            cellInput.type = "text";
+            cellInput.form = document.getElementById("movie-form");
+            formCell.insertAdjacentElement("beforeend", cellInput);*/
+        }
+        else if (i == 5) {
+            for (var j = 0; j < 3; j++) {
+                formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" id=\"${getRadioId(j)}\" name=\"watch-status\" value=\"${j}\" form=\"movie-form\">`);
+                formCell.insertAdjacentHTML("beforeend", `<label for=\"${getRadioId(j)}\" form=\"movie-form\">${Movie.getStaticWatchStatusString(j)}</label>`);
+                /*
+                var cellInput = document.createElement("input");
+                cellInput.type = "radio";
+                cellInput.name = "watch-status";
+                cellInput.value = j;
+                cellInput.form = document.getElementById("movie-form");
+                formCell.insertAdjacentElement("beforeend", cellInput);
+                */
+            }
+        }
+        else if (i == 6) {
+            formCell.insertAdjacentHTML("beforeend", "<input type=\"submit\" form=\"movie-form\">");
+            /*
+            var cellInput = document.createElement("input");
+            cellInput.type = "submit";
+            cellInput.form = document.getElementById("movie-form");
+            formCell.insertAdjacentElement("beforeend", cellInput);*/
+        }
+        newRow.insertAdjacentElement("beforeend", formCell);
+    }
+    document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+    scrollTo(0, getFormX());
+}
+
+function getRadioId(num) {
+    if ((!(Number.isInteger(num)))) {
+        throw new TypeError("num must be an integer.");
+    }
+    if (num < 0 || num > 2) {
+        throw new RangeError("num must be from 0-2, inclusive.");
+    }
+    switch(num) {
+        case 0:
+            return "NW";
+        case 1:
+            return "CW";
+        default:
+            return "W";
+    }
+}
+
 async function getMovieData(movie) {
     if ((!(movie instanceof Movie))) {
         throw new TypeError("Parameter must be of type Movie.");
     }
     var titleString = movie.title;
+    titleString.toLowerCase();
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:!?]/g, "%3A");
@@ -86,19 +182,79 @@ async function getMovieFromTitle(title, genre) {
     if (typeof(title) != "string" || typeof(genre) != "string") {
         throw new TypeError("Parameters must be a string.");
     }
-    title.trim();
-    title.replaceAll(" ", "+");
-    title.replaceAll(/[.,:!?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${title}&type=movie&plot=full`).then(
+    var titleString = title;
+    titleString.trim();
+    titleString.replaceAll(" ", "+");
+    titleString.replaceAll(/[.,:?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => {
-            console.log(json.Director);
-            console.log(json.Plot);
-            console.log(json.Poster);
-            movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
-            console.log(movies);
-            displayMovieInTable(movies[movies.length - 1]);
+            console.log(json.Response);
+            if (json.Response == "True") {
+                console.log(json);
+                console.log(json.Director);
+                console.log(json.Plot);
+                console.log(json.Poster);
+                movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
+                console.log(movies);
+                displayMovieInTable(movies[movies.length - 1]);
+            }
+            else {
+                console.log(json);
+                throw new Error(json.Error);
+            }
         }
+    ).catch(
+        (error) => console.log(error)
     );
+}
+
+async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
+    if (typeof(title) != "string" || typeof(genre) != "string") {
+        throw new TypeError("Parameters must be a string.");
+    }
+    if ((!(Number.isInteger(watchStatus)))) {
+        throw new TypeError("Watch status must be an integer.");
+    }
+    if (watchStatus < 0 || watchStatus > 2) {
+        throw new RangeError("Watch status must be from 0-2, inclusive.");
+    }
+    var titleString = title;
+    titleString.trim();
+    titleString.replaceAll(" ", "+");
+    titleString.replaceAll(/[.,:?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
+        (response) => response.json()
+    ).then(
+        (json) => {
+            console.log(json.Response);
+            if (json.Response == "True") {
+                console.log(json);
+                console.log(json.Director);
+                console.log(json.Plot);
+                console.log(json.Poster);
+                movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus));
+                console.log(movies);
+                displayMovieInTable(movies[movies.length - 1]);
+            }
+            else {
+                console.log(json);
+                throw new Error(json.Error); 
+            }
+        }
+    ).catch(
+        (error) => console.log(error)
+    );
+}
+
+async function loadMovies() {
+    await getMovieFromTitle("Wicked", "Movie Musical");
+    await getMovieFromTitle("In the Heights", "Movie Musical");
+    await getMovieFromTitle("Crazy Rich Asians", "Romantic Comedy");
+    await getMovieFromTitle("Sailor Moon SuperS: The Movie", "Mahou Shojo");
+}
+
+function getFormX() {
+    return document.getElementsByTagName("h1")[0].offsetTop + document.getElementsByTagName("table")[0].offsetTop + document.getElementById("add-movie-form").offsetTop;
 }
