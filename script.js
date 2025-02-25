@@ -338,5 +338,18 @@ function deleteRowWithButton(button) {
             });
             document.getElementsByTagName("tr")[index + 1].remove();
             console.log(movies);
+            console.log(document.getElementsByTagName("table")[0]);
     });
 }
+
+setInterval(() => {
+    if (movies.length == 0) {
+        if (document.getElementsByTagName("td").length == 1)
+            document.getElementsByTagName("td")[0].remove();
+        deletingMovies = false;
+        canDeleteMovie = true;
+        canAddMovie = true;
+        addingMovies = false;
+        document.getElementById("delete-movie").innerText = "Delete Movies";
+    }
+}, 10);
