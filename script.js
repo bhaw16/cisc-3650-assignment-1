@@ -33,6 +33,9 @@ document.getElementById("add-movie").addEventListener("click", () => {
 document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
+document.getElementById("delete-movie").addEventListener("mouseover", () => {
+    (movies.length != 0) ? document.getElementById("delete-movie").setAttribute("style", "cursor: pointer") : document.getElementById("delete-movie").setAttribute("style", "cursor: not-allowed");
+});
 document.getElementById("delete-movie").addEventListener("click", () => {
     if (movies.length == 0) {
         throw new Error("There are no movies to delete.");
