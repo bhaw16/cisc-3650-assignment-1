@@ -51,4 +51,54 @@ class Movie {
                 return "Finished watching";
         }
     }
+
+    equals(object) {
+        if (typeof(object) != "object") {
+            throw new TypeError("object must be of type Object.");
+        }
+        return object instanceof Movie && object.title == this.title && object.director == this.director
+        && object.genre == this.genre && object.plot == this.plot && object.image == this.image
+        && object.watchStatus == this.watchStatus;
+    }
+
+    static findMovie(movieArr, target) {
+        if ((!(Array.isArray(movieArr)))) {
+            throw new TypeError("movieArr must be an array of Movies.");
+        }
+        if ((!(target instanceof Movie))) {
+            throw new TypeError("target must be of type Movie.");
+        }
+        for (var i = 0; i < movieArr.length; i++) {
+            if ((!(movieArr[i] instanceof Movie))) {
+                throw new TypeError("movieArr must be an array of Movies.");
+            }
+            if (movieArr[i].equals(target)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    static getMovieAt(movieArr, index) {
+        if ((!(Array.isArray(movieArr)))) {
+            throw new TypeError("movieArr must be an array of Movies.");
+        }
+        if ((!(Number.isInteger(index)))) {
+            throw new TypeError("index must be an integer.");
+        }
+        if (index < 0 || index >= movieArr.length) {
+            throw new RangeError("index is out of range.");
+        }
+        for (var i = 0; i < movieArr.length; i++) {
+            if ((!(movieArr[i] instanceof Movie))) {
+                throw new TypeError("movieArr must be an array of Movies.");
+            }
+            if (i == index) {
+                return movieArr[i];
+            }
+            else {
+                continue;
+            }
+        }
+    }
 }

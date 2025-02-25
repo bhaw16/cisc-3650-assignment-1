@@ -1,6 +1,7 @@
 var movies = [];
+console.log(`Is movies an array? ${Array.isArray(movies)}`);
 //var movieForm = "<tr><td><input type=\"text\" form=\"movie-form\"></td><td><input type=\"text\" form=\"movie-form\"></td><td></td><td></td><td></td></tr>";
-var canAddMovie = true;
+var canAddMovie = true, canDeleteMovie = true;
 loadMovies();
 
 console.log(movies);
@@ -25,6 +26,20 @@ document.getElementById("add-movie").addEventListener("click", () => {
 });
 document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
+});
+document.getElementById("delete-movie").addEventListener("click", () => {
+    canAddMovie = false;
+    if (canDeleteMovie) {
+        canDeleteMovie = false;
+        addDeleteButtons();
+        document.getElementById("delete-movie").innerText = "Cancel Delete";
+    }
+    else {
+        removeDeleteButtons();
+        canDeleteMovie = true;
+        canAddMovie = true;
+        document.getElementById("delete-movie").innerText = "Delete Movies";
+    }
 });
 document.getElementById("movie-form").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -248,6 +263,38 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
     );
 }
 
+function addDeleteButtons() {
+    for (var i = 0; i < document.getElementsByTagName("tr").length; i++) {
+        var newCell = document.createElement("td");
+        if (i > 0) {
+            //var j = i - 1;
+            var deleteButton = document.createElement("button");
+            deleteButton.id = `delete-${i}`;
+            deleteButton.innerText = "🗑️";
+            deleteRowWithButton(deleteButton);
+            /*var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(deleteButton)) - 1;
+            deleteButton.onclick = () => {
+                console.log(index);
+                var deletedMovie = Movie.getMovieAt(movies, index);
+                delete movies[Movie.findMovie(movies, deletedMovie)];
+                movies = movies.filter((movie) => {
+                    return movie != undefined;
+                });
+                document.getElementsByTagName("tr")[index + 1].remove();
+                console.log(movies);
+            };*/
+            newCell.insertAdjacentElement("afterbegin", deleteButton);
+        }
+        document.getElementsByTagName("tr")[i].insertAdjacentElement("afterbegin", newCell);
+    }
+}
+
+function removeDeleteButtons() {
+    for (var i = 0; i < document.getElementsByTagName("tr").length; i++) {
+        document.getElementsByTagName("tr")[i].children[0].remove();
+    }
+}
+
 async function loadMovies() {
     await getMovieFromTitle("Wicked", "Movie Musical");
     await getMovieFromTitle("In the Heights", "Movie Musical");
@@ -257,4 +304,21 @@ async function loadMovies() {
 
 function getFormX() {
     return document.getElementsByTagName("h1")[0].offsetTop + document.getElementsByTagName("table")[0].offsetTop + document.getElementById("add-movie-form").offsetTop;
+}
+
+function deleteRowWithButton(button) {
+    if ((!(button instanceof HTMLButtonElement))) {
+        throw new TypeError("button must be a button.");
+    }
+    button.addEventListener("click", () => {
+        console.log(index);
+        var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(button)) - 2;
+        var deletedMovie = Movie.getMovieAt(movies, index);
+            delete movies[Movie.findMovie(movies, deletedMovie)];
+            movies = movies.filter((movie) => {
+                return movie != undefined;
+            });
+            document.getElementsByTagName("tr")[index + 1].remove();
+            console.log(movies);
+    });
 }
