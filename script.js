@@ -1,7 +1,7 @@
 var movies = [];
 console.log(`Is movies an array? ${Array.isArray(movies)}`);
 //var movieForm = "<tr><td><input type=\"text\" form=\"movie-form\"></td><td><input type=\"text\" form=\"movie-form\"></td><td></td><td></td><td></td></tr>";
-var canAddMovie = true, canDeleteMovie = true;
+var canAddMovie = true, canDeleteMovie = true, addingMovies = false, deletingMovies = false;
 loadMovies();
 
 console.log(movies);
@@ -11,9 +11,15 @@ for (var i = 0; i < movies.length; i++) {
 //getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", () => {
+    if (deletingMovies) {
+        throw new Error("You cannot add a movie while you are deleting movies.");
+    }
     try {
     if (canAddMovie) {
+        addingMovies = true;
         canAddMovie = false;
+        canDeleteMovie = false;
+        deletingMovies = false;
         addMovieForm();
     }
     else {
@@ -28,16 +34,25 @@ document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
 document.getElementById("delete-movie").addEventListener("click", () => {
-    canAddMovie = false;
+    if (movies.length == 0) {
+        throw new Error("There are no movies to delete.");
+    }
+    if (addingMovies) {
+        throw new Error("You cannot delete movies while adding one.");
+    }
     if (canDeleteMovie) {
+        deletingMovies = true;
+        canAddMovie = false;
         canDeleteMovie = false;
         addDeleteButtons();
         document.getElementById("delete-movie").innerText = "Cancel Delete";
     }
     else {
         removeDeleteButtons();
+        deletingMovies = false;
         canDeleteMovie = true;
         canAddMovie = true;
+        addingMovies = false;
         document.getElementById("delete-movie").innerText = "Delete Movies";
     }
 });
@@ -62,6 +77,9 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     document.getElementById("add-movie-form").remove();
     getMovieFromTitle_WatchStatus(title, genre, watchStatus);
     canAddMovie = true;
+    addingMovies = false;
+    canDeleteMovie = true;
+    deletingMovies = false;
 })
 
     /*var newRow = document.createElement("tr");
