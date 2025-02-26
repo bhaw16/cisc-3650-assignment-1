@@ -83,7 +83,21 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     addingMovies = false;
     canDeleteMovie = true;
     deletingMovies = false;
-})
+});
+console.log("Watch status cells:");
+console.log(document.getElementsByClassName("watch-status"));
+/*for (var i = 0; i < document.getElementsByClassName("watch-status").length; i++) {
+    var cell = document.getElementsByClassName("watch-status")[i];
+    cell.addEventListener("mouseenter", () => {
+        var editButton = document.createElement("button");
+        editButton.className = "btn";
+        editButton.id = "edit-watch-status";
+        cell.insertAdjacentElement("beforeend", editButton);
+    });
+    cell.addEventListener("mouselleave", () => {
+        deleteButton(document.getElementById("edit-watch-status"));
+    });
+}*/
 
     /*var newRow = document.createElement("tr");
     newRow.className = "movie-rows";
@@ -107,7 +121,22 @@ function displayMovieInTable(movie) {
     for (var i = 0; i < 6; i++) {
         var tableData = document.createElement("td");
         console.log(`movie-${movies.indexOf(movie)}`);
-        tableData.className = `movie-${movies.indexOf(movie)}`;
+        (i == 5) ? tableData.className = "watch-status" : tableData.className = `movie-${movies.indexOf(movie)}`;
+        if (i == 5) {
+        tableData.addEventListener("mouseenter", () => {
+            if (!deletingMovies) {
+                var editButton = document.createElement("button");
+                editButton.classList.add("btn");
+                editButton.classList.add("btn-dark");
+                editButton.id = "edit-watch-status";
+                editButton.innerText = "Edit";
+                tableData.insertAdjacentElement("beforeend", editButton);
+            }
+        });
+        tableData.addEventListener("mouseleave", () => {
+            deleteButton(document.getElementById("edit-watch-status"));
+        });
+        }
         var movieAttributeData = getMovieAttribute(movie, i);
         console.log(movieAttributeData);
         console.log(tableData);
@@ -155,7 +184,7 @@ function addMovieForm() {
         }
         else if (i == 5) {
             for (var j = 0; j < 3; j++) {
-                formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" id=\"${getRadioId(j)}\" name=\"watch-status\" value=\"${j}\" form=\"movie-form\">`);
+                formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" id=\"${getRadioId(j)}\" name=\"watch-status\" class=\"watch-status-radio\" value=\"${j}\" form=\"movie-form\">`);
                 formCell.insertAdjacentHTML("beforeend", `<label for=\"${getRadioId(j)}\" form=\"movie-form\">${Movie.getStaticWatchStatusString(j)}</label>`);
                 /*
                 var cellInput = document.createElement("input");
@@ -235,6 +264,8 @@ async function getMovieFromTitle(title, genre) {
                 movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
+                console.log("Watch status cells:");
+                console.log(document.getElementsByClassName("watch-status"));
             }
             else {
                 console.log(json);
@@ -292,6 +323,8 @@ function addDeleteButtons() {
             var deleteButton = document.createElement("button");
             deleteButton.id = `delete-${i}`;
             deleteButton.innerText = "🗑️";
+            deleteButton.classList.add("btn");
+            deleteButton.classList.add("btn-danger");
             deleteRowWithButton(deleteButton);
             /*var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(deleteButton)) - 1;
             deleteButton.onclick = () => {
@@ -356,3 +389,10 @@ setInterval(() => {
         document.getElementById("delete-movie").innerText = "Delete Movies";
     }
 }, 10);
+
+function deleteButton(button) {
+    if ((!(button instanceof HTMLButtonElement))) {
+        throw new TypeError("button must be a <button> element.");
+    }
+    button.remove();
+}
