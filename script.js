@@ -184,8 +184,10 @@ function addMovieForm() {
         }
         else if (i == 5) {
             for (var j = 0; j < 3; j++) {
+                formCell.insertAdjacentHTML("beforeend", "<div class=\"radio\">");
                 formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" id=\"${getRadioId(j)}\" name=\"watch-status\" class=\"watch-status-radio\" value=\"${j}\" form=\"movie-form\">`);
                 formCell.insertAdjacentHTML("beforeend", `<label for=\"${getRadioId(j)}\" form=\"movie-form\">${Movie.getStaticWatchStatusString(j)}</label>`);
+                formCell.insertAdjacentHTML("beforeend", "</div>");
                 /*
                 var cellInput = document.createElement("input");
                 cellInput.type = "radio";
@@ -197,7 +199,7 @@ function addMovieForm() {
             }
         }
         else if (i == 6) {
-            formCell.insertAdjacentHTML("beforeend", "<input type=\"submit\" form=\"movie-form\">");
+            formCell.insertAdjacentHTML("beforeend", "<input class=\"btn btn-dark\" type=\"submit\" form=\"movie-form\">");
             /*
             var cellInput = document.createElement("input");
             cellInput.type = "submit";
