@@ -52,6 +52,25 @@ class Movie {
         }
     }
 
+    setValueFromWatchStatusString(watchStatusString) {
+        if (typeof(watchStatusString) != "string") {
+            throw new TypeError("watchStatusString must be a string.");
+        }
+        switch (watchStatusString.toLowerCase()) {
+            case "not watched":
+                this.watchStatus = 0;
+                break;
+            case "currently watching":
+                this.watchStatus = 1;
+                break;
+            case "finished watching":
+                this.watchStatus = 2;
+                break;
+            default:
+                throw new Error("Invalid string.");
+        }
+    }
+
     equals(object) {
         if (typeof(object) != "object") {
             throw new TypeError("object must be of type Object.");

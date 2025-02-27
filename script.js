@@ -125,16 +125,43 @@ function displayMovieInTable(movie) {
         if (i == 5) {
         tableData.addEventListener("mouseenter", () => {
             if (!deletingMovies) {
+                var dropdownDiv = document.createElement("div");
+                dropdownDiv.className = "dropdown";
+                dropdownDiv.id = "watch-status-dropdown";
                 var editButton = document.createElement("button");
                 editButton.classList.add("btn");
                 editButton.classList.add("btn-dark");
+                editButton.classList.add("dropdown-toggle");
+                editButton.setAttribute("data-bs-toggle", "dropdown");
                 editButton.id = "edit-watch-status";
                 editButton.innerText = "Edit";
-                tableData.insertAdjacentElement("beforeend", editButton);
+                var spanCaret = document.createElement("span");
+                spanCaret.className = "caret";
+                editButton.insertAdjacentElement("beforeend", spanCaret);
+                dropdownDiv.insertAdjacentElement("beforeend", editButton);
+                var dropdown = document.createElement("ul");
+                dropdown.className = "dropdown-menu";
+                for (var j = 0; j < 3; j++) {
+                    var dropdownItem = document.createElement("li");
+                    var dropdownLink = document.createElement("a");
+                    dropdownLink.href = "#";
+                    dropdownLink.innerText = Movie.getStaticWatchStatusString(j);
+                    addEventListenerToDropdownLink(dropdownLink, movie);
+                    dropdownItem.insertAdjacentElement("beforeend", dropdownLink);
+                    dropdown.insertAdjacentElement("beforeend", dropdownItem);
+                    console.log(dropdownItem);
+                    console.log(dropdownLink);
+                }
+                console.log(editButton);
+                console.log(dropdown);
+                console.log(dropdownDiv);
+                dropdownDiv.insertAdjacentElement("beforeend", dropdown);
+                tableData.insertAdjacentElement("beforeend", dropdownDiv);
+                console.log(tableData);
             }
         });
         tableData.addEventListener("mouseleave", () => {
-            deleteButton(document.getElementById("edit-watch-status"));
+            deleteDropdown(document.getElementById("watch-status-dropdown"));
         });
         }
         var movieAttributeData = getMovieAttribute(movie, i);
@@ -392,9 +419,49 @@ setInterval(() => {
     }
 }, 10);
 
-function deleteButton(button) {
-    if ((!(button instanceof HTMLButtonElement))) {
-        throw new TypeError("button must be a <button> element.");
+function deleteDropdown(dropdownDiv) {
+    if ((!(dropdownDiv instanceof HTMLDivElement)) && (!(dropdownDiv.classList.contains("dropwdown")))) {
+        throw new TypeError("dropdownDiv must be a Bootstrap Dropwdown menu.");
     }
-    button.remove();
+    dropdownDiv.remove();
+}
+/*
+function setLinkWatchStatus(dropdownLink, int) {
+    if ((!(dropdownLink instanceof HTMLAnchorElement)) && (!(dropdownLink.parentElement.parentElement.classList.contains("dropdown-menu")))) {
+        throw new TypeError("dropdownLink must be an <a> elemnt inside of a Bootstrap dropdown menu.");
+    }
+    if ((!(Number.isInteger(int)))) {
+        throw new TypeError("int must be an integer.");
+    }
+    if (int < 0 || int > 2) {
+        throw new RangeError("int must be from 0-2, inclusive.");
+    }
+    dropdownLink.innerText = Movie.getStaticWatchStatusString(int);
+}*/
+
+function editWatchStatus(dropdownLink, movie) {
+    if ((!(dropdownLink instanceof HTMLAnchorElement)) && (!(dropdownLink.parentElement.parentElement.classList.contains("dropdown-menu")))) {
+        throw new TypeError("dropdownLink must be an <a> elemnt inside of a Bootstrap dropdown menu.");
+    }
+    if ((!(movie instanceof Movie))) {
+        throw new TypeError("movie must be of type Movie.");
+    }
+    var movieIndex = Movie.findMovie(movies, movie);
+    movie.setValueFromWatchStatusString(dropdownLink.innerText);
+    movies[movieIndex] = movie;
+    console.log(movies);
+    document.getElementsByClassName("watch-status")[movieIndex].innerText = movie.getWatchStatusString();
+}
+
+function addEventListenerToDropdownLink(dropdownLink, movie) {
+    if ((!(dropdownLink instanceof HTMLAnchorElement)) && (!(dropdownLink.parentElement.parentElement.classList.contains("dropdown-menu")))) {
+        throw new TypeError("dropdownLink must be an <a> elemnt inside of a Bootstrap dropdown menu.");
+    }
+    if ((!(movie instanceof Movie))) {
+        throw new TypeError("movie must be of type Movie.");
+    }
+    dropdownLink.addEventListener("click", (event) => {
+        event.preventDefault();
+        editWatchStatus(dropdownLink, movie);
+    });
 }
