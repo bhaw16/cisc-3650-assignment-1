@@ -10,7 +10,7 @@ for (var i = 0; i < movies.length; i++) {
 }
 //getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
-document.getElementById("add-movie").addEventListener("click", () => {
+document.getElementById("add-movie").addEventListener("click", (event) => {
     if (deletingMovies) {
         throw new Error("You cannot add a movie while you are deleting movies.");
     }
@@ -22,11 +22,16 @@ document.getElementById("add-movie").addEventListener("click", () => {
         deletingMovies = false;
         addMovieForm();
     }
-    else {
+    if (addingMovies) {
+        canAddMovie = false;
+        canDeleteMovie = false;
+        deletingMovies = false;
         throw new Error("Finish adding this movie before adding another one.");
     }
     }
     catch(err) {
+        canAddMovie = false;
+        addingMovies = false;
         console.log(err.message);
     }
 });
@@ -196,6 +201,7 @@ function getMovieAttribute(movie, number) {
 }
 
 function addMovieForm() {
+    if (!canAddMovie && addingMovies) {
     var newRow = document.createElement("tr");
     newRow.id = "add-movie-form";
     for (var i = 0; i < 7; i++) {
@@ -237,6 +243,10 @@ function addMovieForm() {
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
     scrollTo(0, getFormX());
+    }
+    else {
+        throw new Error("Finish adding this movie before adding another one.");
+    }
 }
 
 function getRadioId(num) {
@@ -255,6 +265,7 @@ function getRadioId(num) {
             return "W";
     }
 }
+
 
 async function getMovieData(movie) {
     if ((!(movie instanceof Movie))) {
@@ -409,12 +420,13 @@ function deleteRowWithButton(button) {
 
 setInterval(() => {
     if (movies.length == 0) {
-        if (document.getElementsByTagName("td").length == 1)
+        if (document.getElementsByTagName("td").length == 1) {
             document.getElementsByTagName("td")[0].remove();
-        deletingMovies = false;
-        canDeleteMovie = true;
-        canAddMovie = true;
-        addingMovies = false;
+            deletingMovies = false;
+            canDeleteMovie = true;
+            canAddMovie = true;
+            addingMovies = false;
+        }
         document.getElementById("delete-movie").innerText = "Delete Movies";
     }
 }, 10);
