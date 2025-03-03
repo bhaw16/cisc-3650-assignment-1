@@ -5,7 +5,14 @@
     font-weight: 400;
     font-style: normal;
 */
+
+table {
+    margin: 5vw;
+}
   
+.top-button {
+    margin-top: 2vw;
+}
 
 .radio {
     display: block;
@@ -13,4 +20,12 @@
 
 label {
     display: inline;
+}
+
+#go-to-top {
+    display: block;
+    position: fixed;
+    bottom: 1vh;
+    right: 1vw;
+    z-index: 2;
 }

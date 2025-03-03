@@ -1,8 +1,25 @@
 var movies = [];
 console.log(`Is movies an array? ${Array.isArray(movies)}`);
-//var movieForm = "<tr><td><input type=\"text\" form=\"movie-form\"></td><td><input type=\"text\" form=\"movie-form\"></td><td></td><td></td><td></td></tr>";
+console.log(document.getElementsByTagName("p"));
 var canAddMovie = true, canDeleteMovie = true, addingMovies = false, deletingMovies = false;
+var numAddClicks = 0;
 loadMovies();
+var scrollToTop = document.createElement("button");
+document.getElementsByTagName("table")[0].insertAdjacentElement("afterend", scrollToTop);
+scrollToTop.classList.add("btn");
+scrollToTop.classList.add("btn-dark");
+scrollToTop.innerText = "Go To Top";
+scrollToTop.id = "go-to-top";
+scrollToTop.addEventListener("click", () => {
+    scrollTo(0, 0);
+});
+window.addEventListener("scroll", () => {
+    if (window.scrollY > 20)
+        scrollToTop.removeAttribute("hidden");
+    else
+        scrollToTop.setAttribute("hidden", "");
+});
+console.log(document.getElementsByTagName("button"));
 
 console.log(movies);
 for (var i = 0; i < movies.length; i++) {
@@ -11,57 +28,81 @@ for (var i = 0; i < movies.length; i++) {
 //getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
 document.getElementById("add-movie").addEventListener("click", (event) => {
-    if (deletingMovies) {
+    numAddClicks++;
+    if (deletingMovies && !canDeleteMovie) {
         throw new Error("You cannot add a movie while you are deleting movies.");
     }
     try {
-    if (canAddMovie) {
-        addingMovies = true;
-        canAddMovie = false;
-        canDeleteMovie = false;
-        deletingMovies = false;
-        addMovieForm();
-    }
-    if (addingMovies) {
-        canAddMovie = false;
-        canDeleteMovie = false;
-        deletingMovies = false;
-        throw new Error("Finish adding this movie before adding another one.");
-    }
+        if (canAddMovie && !addingMovies) {
+            addingMovies = true;
+            canAddMovie = false;
+            canDeleteMovie = false;
+            deletingMovies = false;
+            addMovieForm();
+        }
+        if (addingMovies && !canAddMovie) {
+            canAddMovie = false;
+            canDeleteMovie = false;
+            deletingMovies = false;
+            if (numAddClicks > 1)
+                throw new Error("Finish adding this movie before adding another one.");
+        }
     }
     catch(err) {
         canAddMovie = false;
-        addingMovies = false;
         console.log(err.message);
+        if (err.message == "You cannot add a movie while you are deleting movies.") {
+            document.getElementsByTagName("p")[0].removeAttribute("hidden");
+            document.getElementsByTagName("p")[0].innerText = err.message;
+            if ((!(document.getElementsByTagName("p")[0].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[0].classList.add("text-danger");
+        }
+        else {
+            document.getElementsByTagName("p")[1].removeAttribute("hidden");
+            document.getElementsByTagName("p")[1].innerText = err.message;
+            if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[1].classList.add("text-danger");
+            scrollTo(0, getSecondParagraph());
+        }
     }
 });
 document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
 document.getElementById("delete-movie").addEventListener("mouseover", () => {
-    (movies.length != 0) ? document.getElementById("delete-movie").setAttribute("style", "cursor: pointer") : document.getElementById("delete-movie").setAttribute("style", "cursor: not-allowed");
+    (movies.length != 0 || !addingMovies) ? document.getElementById("delete-movie").setAttribute("style", "cursor: pointer") : document.getElementById("delete-movie").setAttribute("style", "cursor: not-allowed");
 });
 document.getElementById("delete-movie").addEventListener("click", () => {
-    if (movies.length == 0) {
-        throw new Error("There are no movies to delete.");
-    }
+    try {
     if (addingMovies) {
         throw new Error("You cannot delete movies while adding one.");
     }
-    if (canDeleteMovie) {
+    if (movies.length == 0) {
+        throw new Error("There are no movies to delete.");
+    }
+    if (canDeleteMovie && !deletingMovies) {
         deletingMovies = true;
         canAddMovie = false;
+        addingMovies = false;
         canDeleteMovie = false;
         addDeleteButtons();
         document.getElementById("delete-movie").innerText = "Cancel Delete";
     }
-    else {
+    else if (!addingMovies) {
         removeDeleteButtons();
         deletingMovies = false;
         canDeleteMovie = true;
         canAddMovie = true;
         addingMovies = false;
         document.getElementById("delete-movie").innerText = "Delete Movies";
+    }
+    }
+    catch(err) {
+        console.log(err.message);
+        document.getElementsByTagName("p")[0].removeAttribute("hidden");
+        document.getElementsByTagName("p")[0].innerText = err.message;
+        if ((!(document.getElementsByTagName("p")[0].classList.contains("text-danger"))))
+            document.getElementsByTagName("p")[0].classList.add("text-danger");
     }
 });
 document.getElementById("movie-form").addEventListener("submit", (event) => {
@@ -88,6 +129,7 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     addingMovies = false;
     canDeleteMovie = true;
     deletingMovies = false;
+    numAddClicks = 0;
 });
 console.log("Watch status cells:");
 console.log(document.getElementsByClassName("watch-status"));
@@ -147,6 +189,8 @@ function displayMovieInTable(movie) {
                 var dropdown = document.createElement("ul");
                 dropdown.className = "dropdown-menu";
                 for (var j = 0; j < 3; j++) {
+                    if (j == movie.watchStatus)
+                        continue;
                     var dropdownItem = document.createElement("li");
                     var dropdownLink = document.createElement("a");
                     dropdownLink.href = "#";
@@ -356,6 +400,7 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
 }
 
 function addDeleteButtons() {
+   
     for (var i = 0; i < document.getElementsByTagName("tr").length; i++) {
         var newCell = document.createElement("td");
         if (i > 0) {
@@ -398,6 +443,10 @@ async function loadMovies() {
 
 function getFormX() {
     return document.getElementsByTagName("h1")[0].offsetTop + document.getElementsByTagName("table")[0].offsetTop + document.getElementById("add-movie-form").offsetTop;
+}
+
+function getSecondParagraph() {
+    return getFormX() + document.getElementsByTagName("p")[1].offsetTop;
 }
 
 function deleteRowWithButton(button) {
