@@ -131,13 +131,22 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     }
     if (watchStatus == undefined)
         throw new Error("You must specify a watch status.");
-    document.getElementById("add-movie-form").remove();
-    getMovieFromTitle_WatchStatus(title, genre, watchStatus);
+    getMovieFromTitle_WatchStatus(title, genre, watchStatus).then(() => {
+    
+    //document.getElementById("add-movie-form").remove();
     canAddMovie = true;
     addingMovies = false;
     canDeleteMovie = true;
     deletingMovies = false;
     numAddClicks = 0;
+    }).catch((error)  => {
+        console.log(error.message);
+        document.getElementsByTagName("p")[1].removeAttribute("hidden");
+        document.getElementsByTagName("p")[1].innerText = error.message;
+        if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+            document.getElementsByTagName("p")[1].classList.add("text-danger");
+        document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+    })
 });
 console.log("Watch status cells:");
 console.log(document.getElementsByClassName("watch-status"));
@@ -409,6 +418,7 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
                 movies.push(newMovie);
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
+                document.getElementById("add-movie-form").remove();
             }
             else {
                 console.log(json);
