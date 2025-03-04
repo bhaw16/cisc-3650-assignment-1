@@ -183,7 +183,7 @@ function displayMovieInTable(movie) {
     }
     var movieRow = document.createElement("tr");
     movieRow.className = "movie-rows";
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 7; i++) {
         var tableData = document.createElement("td");
         console.log(`movie-${movies.indexOf(movie)}`);
         (i == 5) ? tableData.className = "watch-status" : tableData.className = `movie-${movies.indexOf(movie)}`;
@@ -249,13 +249,15 @@ function getMovieAttribute(movie, number) {
         case 0:
             return movie.title;
         case 1:
-            return movie.genre;
+            return movie.year;
         case 2:
-            return movie.director;
+            return movie.genre;
         case 3:
+            return movie.director;
+        case 4:
             return movie.plot;
             //return movie.hyperlink;
-        case 4:
+        case 5:
             return movie.image;
         default:
             return movie.getWatchStatusString();
@@ -363,7 +365,8 @@ async function getMovieFromTitle(title, genre) {
                 console.log(json.Director);
                 console.log(json.Plot);
                 console.log(json.Poster);
-                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, 0)
+                console.log(json.Year);
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, 0, Number.parseInt(json.Year))
                 if (Movie.findMovie(movies, newMovie) > -1)
                     throw new Error("This movie is already in the log. Please add a different one.");
                 movies.push(newMovie);
@@ -414,7 +417,8 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
                 console.log(json.Director);
                 console.log(json.Plot);
                 console.log(json.Poster);
-                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus)
+                console.log(json.Year);
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, Number.parseInt(json.Year))
                 if (Movie.findMovie(movies, newMovie) > -1)
                     throw new Error("This movie is already in the log. Please add a different one.");
                 movies.push(newMovie);

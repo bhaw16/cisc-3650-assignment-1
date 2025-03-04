@@ -1,5 +1,5 @@
 class Movie {
-    constructor(title, genre, director, /*moreInfoLink,*/ plot, poster, watchStatus) {
+    constructor(title, genre, director, /*moreInfoLink,*/ plot, poster, watchStatus, year) {
         if (typeof(title) != "string" || typeof(genre) != "string"
         || typeof(director) != "string"/* || typeof(moreInfoLink) != "string"*/
         || typeof(plot) != "string" || typeof(poster) != "string") {
@@ -8,8 +8,14 @@ class Movie {
         if ((!(Number.isInteger(watchStatus)))) {
             throw new TypeError("Watch status must be an integer.");
         }
+        if ((!(Number.isInteger(year)))) {
+            throw new TypeError("year must be an integer.");
+        }
         if (watchStatus < 0 || watchStatus > 2) {
             throw new RangeError("Watch status must be from 0-2, inclusive.");
+        }
+        if (year < 1878 || year > 2025) {
+            throw new RangeError("The year must be from 1878 (first motion picture release) to 2025 (current year), inclusive.");
         }
         this.title = title;
         this.genre = genre;
@@ -22,7 +28,7 @@ class Movie {
         this.image = document.createElement("img");
         this.image.src = poster;
         this.image.alt = `Poster of the movie ${title}`;
-        this.year = "";
+        this.year = year;
         this.rating = 0;
     }
 
