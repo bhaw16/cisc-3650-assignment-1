@@ -74,7 +74,7 @@ document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
 document.getElementById("delete-movie").addEventListener("mouseover", () => {
-    (movies.length != 0 || !addingMovies) ? document.getElementById("delete-movie").setAttribute("style", "cursor: pointer") : document.getElementById("delete-movie").setAttribute("style", "cursor: not-allowed");
+    (movies.length == 0 || (!canDeleteMovie && !deletingMovies)) ? document.getElementById("delete-movie").setAttribute("style", "cursor: not-allowed") : document.getElementById("delete-movie").setAttribute("style", "cursor: pointer");
 });
 document.getElementById("delete-movie").addEventListener("mouseup", () => {
     try {
@@ -510,7 +510,7 @@ setInterval(() => {
         if (document.getElementsByTagName("td").length == 1) {
             document.getElementsByTagName("td")[0].remove();
             deletingMovies = false;
-            canDeleteMovie = true;
+            canDeleteMovie = false;
             canAddMovie = true;
             addingMovies = false;
         }
