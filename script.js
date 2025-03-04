@@ -146,6 +146,7 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
         if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
             document.getElementsByTagName("p")[1].classList.add("text-danger");
         document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+        scrollTo(0, getSecondParagraph());
     })
 });
 console.log("Watch status cells:");
@@ -383,6 +384,7 @@ async function getMovieFromTitle(title, genre) {
             if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
                 document.getElementsByTagName("p")[1].classList.add("text-danger");
             document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            scrollTo(0, getSecondParagraph());
             console.log(error);
         }
     );
@@ -432,6 +434,7 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
             if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
                 document.getElementsByTagName("p")[1].classList.add("text-danger");
             document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            scrollTo(0, getSecondParagraph());
             console.log(error);
         }
     );
