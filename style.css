@@ -29,3 +29,17 @@ label {
     right: 1vw;
     z-index: 2;
 }
+
+.disabled {
+    cursor: not-allowed;
+    pointer-events: all !important;
+}
+
+.table {
+    margin-bottom: 2vh;
+}
+
+/*button:disabled {
+    cursor: not-allowed;
+    pointer-events: all !important;
+}*/

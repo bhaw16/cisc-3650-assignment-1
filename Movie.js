@@ -22,6 +22,8 @@ class Movie {
         this.image = document.createElement("img");
         this.image.src = poster;
         this.image.alt = `Poster of the movie ${title}`;
+        this.year = "";
+        this.rating = 0;
     }
 
     getWatchStatusString() {
@@ -75,9 +77,8 @@ class Movie {
         if (typeof(object) != "object") {
             throw new TypeError("object must be of type Object.");
         }
-        return object instanceof Movie && object.title == this.title && object.director == this.director
-        && object.genre == this.genre && object.plot == this.plot && object.image == this.image
-        && object.watchStatus == this.watchStatus;
+        return object instanceof Movie && object.title == this.title && object.director == this.director;
+        //&& object.genre == this.genre && object.plot == this.plot && object.image == this.image;
     }
 
     static findMovie(movieArr, target) {

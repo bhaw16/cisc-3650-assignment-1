@@ -4,12 +4,14 @@ console.log(document.getElementsByTagName("p"));
 var canAddMovie = true, canDeleteMovie = true, addingMovies = false, deletingMovies = false;
 var numAddClicks = 0;
 loadMovies();
+console.log(document.getElementsByClassName("table-bordered")[0].style);
 var scrollToTop = document.createElement("button");
 document.getElementsByTagName("table")[0].insertAdjacentElement("afterend", scrollToTop);
 scrollToTop.classList.add("btn");
 scrollToTop.classList.add("btn-dark");
 scrollToTop.innerText = "Go To Top";
 scrollToTop.id = "go-to-top";
+scrollToTop.setAttribute("hidden", "");
 scrollToTop.addEventListener("click", () => {
     scrollTo(0, 0);
 });
@@ -27,7 +29,7 @@ for (var i = 0; i < movies.length; i++) {
 }
 //getMovieData(movies[0]);
 console.log(document.getElementsByTagName("td"));
-document.getElementById("add-movie").addEventListener("click", (event) => {
+document.getElementById("add-movie").addEventListener("mouseup", (event) => {
     numAddClicks++;
     if (deletingMovies && !canDeleteMovie) {
         throw new Error("You cannot add a movie while you are deleting movies.");
@@ -56,12 +58,14 @@ document.getElementById("add-movie").addEventListener("click", (event) => {
             document.getElementsByTagName("p")[0].innerText = err.message;
             if ((!(document.getElementsByTagName("p")[0].classList.contains("text-danger"))))
                 document.getElementsByTagName("p")[0].classList.add("text-danger");
+            document.getElementsByTagName("p")[1].setAttribute("hidden", "");
         }
         else {
             document.getElementsByTagName("p")[1].removeAttribute("hidden");
             document.getElementsByTagName("p")[1].innerText = err.message;
             if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
                 document.getElementsByTagName("p")[1].classList.add("text-danger");
+            document.getElementsByTagName("p")[0].setAttribute("hidden", "");
             scrollTo(0, getSecondParagraph());
         }
     }
@@ -72,7 +76,7 @@ document.getElementById("add-movie").addEventListener("mouseover", () => {
 document.getElementById("delete-movie").addEventListener("mouseover", () => {
     (movies.length != 0 || !addingMovies) ? document.getElementById("delete-movie").setAttribute("style", "cursor: pointer") : document.getElementById("delete-movie").setAttribute("style", "cursor: not-allowed");
 });
-document.getElementById("delete-movie").addEventListener("click", () => {
+document.getElementById("delete-movie").addEventListener("mouseup", () => {
     try {
     if (addingMovies) {
         throw new Error("You cannot delete movies while adding one.");
@@ -103,10 +107,14 @@ document.getElementById("delete-movie").addEventListener("click", () => {
         document.getElementsByTagName("p")[0].innerText = err.message;
         if ((!(document.getElementsByTagName("p")[0].classList.contains("text-danger"))))
             document.getElementsByTagName("p")[0].classList.add("text-danger");
+        document.getElementsByTagName("p")[1].setAttribute("hidden", "");
     }
 });
 document.getElementById("movie-form").addEventListener("submit", (event) => {
     event.preventDefault();
+    for (var i = 0; i < document.getElementsByTagName("p").length; i++) {
+        document.getElementsByTagName("p")[i].setAttribute("hidden", "");
+    }
     var title, genre, watchStatus;
     if (document.getElementById("title").value == "") 
         throw new Error("You must enter a title.");
@@ -345,7 +353,10 @@ async function getMovieFromTitle(title, genre) {
                 console.log(json.Director);
                 console.log(json.Plot);
                 console.log(json.Poster);
-                movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, 0));
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, 0)
+                if (Movie.findMovie(movies, newMovie) > -1)
+                    throw new Error("This movie is already in the log. Please add a different one.");
+                movies.push(newMovie);
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
                 console.log("Watch status cells:");
@@ -357,7 +368,14 @@ async function getMovieFromTitle(title, genre) {
             }
         }
     ).catch(
-        (error) => console.log(error)
+        (error) => {
+            document.getElementsByTagName("p")[1].removeAttribute("hidden");
+            document.getElementsByTagName("p")[1].innerText = error.message;
+            if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[1].classList.add("text-danger");
+            document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            console.log(error);
+        }
     );
 }
 
@@ -385,17 +403,27 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
                 console.log(json.Director);
                 console.log(json.Plot);
                 console.log(json.Poster);
-                movies.push(new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus));
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus)
+                if (Movie.findMovie(movies, newMovie) > -1)
+                    throw new Error("This movie is already in the log. Please add a different one.");
+                movies.push(newMovie);
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
             }
             else {
                 console.log(json);
-                throw new Error(json.Error); 
+                throw new Error(`${json.Error} Please add a different movie.`);
             }
         }
     ).catch(
-        (error) => console.log(error)
+        (error) => {
+            document.getElementsByTagName("p")[1].removeAttribute("hidden");
+            document.getElementsByTagName("p")[1].innerText = error.message;
+            if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[1].classList.add("text-danger");
+            document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            console.log(error);
+        }
     );
 }
 
@@ -477,6 +505,36 @@ setInterval(() => {
             addingMovies = false;
         }
         document.getElementById("delete-movie").innerText = "Delete Movies";
+    }
+    if (numAddClicks > 0 && !canAddMovie) {
+        //document.getElementById("add-movie").classList.remove("btn-dark");
+        //document.getElementById("add-movie").setAttribute("disabled", "");
+        document.getElementById("add-movie").classList.add("disabled");
+        //document.getElementById("add-movie").classList.add("btn-secondary");
+        document.getElementById("add-movie").classList.add("shadow-none");
+        //document.getElementById("add-movie").style.backgroundColor = window.getComputedStyle(document.getElementsByTagName("html")[0]).getPropertyValue("--bs-btn-bg");
+        document.getElementById("add-movie").setAttribute("aria-disabled", "true");
+        //document.getElementById("add-movie").style.color = "none";
+    }
+    else {
+        document.getElementById("add-movie").classList.remove("disabled");
+        document.getElementById("add-movie").classList.remove("shadow-none");
+        document.getElementById("add-movie").removeAttribute("aria-disabled");
+    }
+    if (!canDeleteMovie && !deletingMovies) {
+        //document.getElementById("delete-movie").classList.remove("btn-dark");
+        //document.getElementById("delete-movie").setAttribute("disabled", "");
+        document.getElementById("delete-movie").classList.add("disabled");
+        //document.getElementById("delete-movie").classList.add("btn-secondary");
+        document.getElementById("delete-movie").classList.add("shadow-none");
+        //document.getElementById("delete-movie").style.backgroundColor = window.getComputedStyle(document.getElementsByTagName("html")[0]).getPropertyValue("--bs-btn-bg");
+        document.getElementById("delete-movie").setAttribute("aria-disabled", "true");
+        //document.getElementById("delete-movie").style.color = "none";
+    }
+    else {
+        document.getElementById("delete-movie").classList.remove("disabled");
+        document.getElementById("delete-movie").classList.remove("shadow-none");
+        document.getElementById("delete-movie").removeAttribute("aria-disabled");
     }
 }, 10);
 
