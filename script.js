@@ -1,3 +1,4 @@
+var sound = new Audio("yeah-sound.wav");
 var movies = [];
 //var stepButtons = "<button class=\"btn btn-dark\" id=\"step-up\">‸</button><button class=\"btn btn-dark\" id=\"step-down\">˯</button>";
 console.log(`Is movies an array? ${Array.isArray(movies)}`);
@@ -722,4 +723,10 @@ function stepDown() {
             if (err instanceof RangeError)
                 document.getElementById("year").value = 2025;
         }
+}
+
+function groupByDirector() {
+    for (var i = 0; i < movies.length; i++) {
+
+    }
 }

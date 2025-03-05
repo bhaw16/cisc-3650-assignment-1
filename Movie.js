@@ -129,6 +129,6 @@ class Movie {
     }
 
     getDirectorList() {
-        return this.director.split(", ");
+        return {director: this.director.split(", "), rating: this.rating};
     }
 }
