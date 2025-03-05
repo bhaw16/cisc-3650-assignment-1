@@ -127,4 +127,8 @@ class Movie {
             }
         }
     }
+
+    getDirectorList() {
+        return this.director.split(", ");
+    }
 }
