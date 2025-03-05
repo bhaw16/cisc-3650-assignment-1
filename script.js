@@ -295,7 +295,7 @@ function addMovieForm() {
         var formCell = document.createElement("td");
         if (i < 3) {
             var textId = (i == 0) ? "title" : ((i == 1) ? "year" : "genre");
-            var inputType = (textId == "year") ? "number" : "text";
+            var inputType = (textId == "year") ? "tel" : "text";
             formCell.insertAdjacentHTML("beforeend", `<input type=\"${inputType}\" id=\"${textId}\" form=\"movie-form\">`);
             if (i == 1) {
                 formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"step-up\">‸</button>");
@@ -307,7 +307,7 @@ function addMovieForm() {
             cellInput.form = document.getElementById("movie-form");
             formCell.insertAdjacentElement("beforeend", cellInput);*/
         }
-        else if (i == 5) {
+        else if (i == 6) {
             for (var j = 0; j < 3; j++) {
                 formCell.insertAdjacentHTML("beforeend", "<div class=\"radio\">");
                 formCell.insertAdjacentHTML("beforeend", `<input type=\"radio\" id=\"${getRadioId(j)}\" name=\"watch-status\" class=\"watch-status-radio\" value=\"${j}\" form=\"movie-form\">`);
@@ -323,7 +323,7 @@ function addMovieForm() {
                 */
             }
         }
-        else if (i == 6) {
+        else if (i == 7) {
             formCell.insertAdjacentHTML("beforeend", "<input class=\"btn btn-dark\" type=\"submit\" form=\"movie-form\">");
             /*
             var cellInput = document.createElement("input");
@@ -341,6 +341,8 @@ function addMovieForm() {
         stepDown();
     });
     scrollTo(0, getFormX());
+    //document.getElementById("year").removeAttribute("step");
+    //document.getElementById("year").setAttribute("inputmode", "numeric");
     }
     else {
         throw new Error("Finish adding this movie before adding another one.");
@@ -589,9 +591,9 @@ function deleteRowWithButton(button) {
     if ((!(button instanceof HTMLButtonElement))) {
         throw new TypeError("button must be a button.");
     }
-    button.addEventListener("click", () => {
+    button.addEventListener("mouseup", () => {
         console.log(index);
-        var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(button)) - 2;
+        var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(button)) - 3;
         var deletedMovie = Movie.getMovieAt(movies, index);
             delete movies[Movie.findMovie(movies, deletedMovie)];
             movies = movies.filter((movie) => {
@@ -726,7 +728,13 @@ function stepDown() {
 }
 
 function groupByDirector() {
+    var directors = new Set();
     for (var i = 0; i < movies.length; i++) {
-
+        for (var j = 0; j < movies[i].getDirectorList().director.length; j++) {
+            directors.add(movies[i].getDirectorList().director[j]);
+        }
+    }
+    for (var d of directors) {
+        
     }
 }
