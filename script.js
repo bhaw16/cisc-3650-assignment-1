@@ -1,4 +1,5 @@
 var movies = [];
+//var stepButtons = "<button class=\"btn btn-dark\" id=\"step-up\">‸</button><button class=\"btn btn-dark\" id=\"step-down\">˯</button>";
 console.log(`Is movies an array? ${Array.isArray(movies)}`);
 console.log(document.getElementsByTagName("p"));
 var canAddMovie = true, canDeleteMovie = true, addingMovies = false, deletingMovies = false;
@@ -115,7 +116,7 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     for (var i = 0; i < document.getElementsByTagName("p").length; i++) {
         document.getElementsByTagName("p")[i].setAttribute("hidden", "");
     }
-    var title, genre, watchStatus;
+    var title, year, genre, watchStatus;
     if (document.getElementById("title").value == "") 
         throw new Error("You must enter a title.");
     else 
@@ -131,8 +132,10 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     }
     if (watchStatus == undefined)
         throw new Error("You must specify a watch status.");
-    getMovieFromTitle_WatchStatus(title, genre, watchStatus).then(() => {
-    
+    if (document.getElementById("year").value != "")
+        year = Number.parseInt(document.getElementById("year").value);
+    if (year == undefined) {
+        getMovieFromTitle_WatchStatus(title, genre, watchStatus).then(() => {
     //document.getElementById("add-movie-form").remove();
     canAddMovie = true;
     addingMovies = false;
@@ -148,6 +151,25 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
         document.getElementsByTagName("p")[0].setAttribute("hidden", "");
         scrollTo(0, getSecondParagraph());
     })
+}
+else {
+    getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, year).then(() => {
+        //document.getElementById("add-movie-form").remove();
+        canAddMovie = true;
+        addingMovies = false;
+        canDeleteMovie = true;
+        deletingMovies = false;
+        numAddClicks = 0;
+        }).catch((error)  => {
+            console.log(error.message);
+            document.getElementsByTagName("p")[1].removeAttribute("hidden");
+            document.getElementsByTagName("p")[1].innerText = error.message;
+            if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[1].classList.add("text-danger");
+            document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            scrollTo(0, getSecondParagraph());
+})
+}
 });
 console.log("Watch status cells:");
 console.log(document.getElementsByClassName("watch-status"));
@@ -186,8 +208,8 @@ function displayMovieInTable(movie) {
     for (var i = 0; i < 7; i++) {
         var tableData = document.createElement("td");
         console.log(`movie-${movies.indexOf(movie)}`);
-        (i == 5) ? tableData.className = "watch-status" : tableData.className = `movie-${movies.indexOf(movie)}`;
-        if (i == 5) {
+        (i == 6) ? tableData.className = "watch-status" : tableData.className = `movie-${movies.indexOf(movie)}`;
+        if (i == 6) {
         tableData.addEventListener("mouseenter", () => {
             if (!deletingMovies) {
                 var dropdownDiv = document.createElement("div");
@@ -268,11 +290,16 @@ function addMovieForm() {
     if (!canAddMovie && addingMovies) {
     var newRow = document.createElement("tr");
     newRow.id = "add-movie-form";
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 8; i++) {
         var formCell = document.createElement("td");
-        if (i < 2) {
-            var textId = (i == 0) ? "title" : "genre";
-            formCell.insertAdjacentHTML("beforeend", `<input type=\"text\" id=\"${textId}\" form=\"movie-form\">`);
+        if (i < 3) {
+            var textId = (i == 0) ? "title" : ((i == 1) ? "year" : "genre");
+            var inputType = (textId == "year") ? "number" : "text";
+            formCell.insertAdjacentHTML("beforeend", `<input type=\"${inputType}\" id=\"${textId}\" form=\"movie-form\">`);
+            if (i == 1) {
+                formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"step-up\">‸</button>");
+                formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"step-down\">˯</button>");
+            }
             /*
             var cellInput = document.createElement("input");
             cellInput.type = "text";
@@ -306,6 +333,12 @@ function addMovieForm() {
         newRow.insertAdjacentElement("beforeend", formCell);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", newRow);
+    document.getElementById("step-up").addEventListener("mouseup", () => {
+        stepUp();
+    });
+    document.getElementById("step-down").addEventListener("mouseup", () => {
+        stepDown();
+    });
     scrollTo(0, getFormX());
     }
     else {
@@ -419,6 +452,63 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
                 console.log(json.Poster);
                 console.log(json.Year);
                 var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, Number.parseInt(json.Year))
+                if (Movie.findMovie(movies, newMovie) > -1)
+                    throw new Error("This movie is already in the log. Please add a different one.");
+                movies.push(newMovie);
+                console.log(movies);
+                displayMovieInTable(movies[movies.length - 1]);
+                document.getElementById("add-movie-form").remove();
+            }
+            else {
+                console.log(json);
+                throw new Error(`${json.Error} Please add a different movie.`);
+            }
+        }
+    ).catch(
+        (error) => {
+            document.getElementsByTagName("p")[1].removeAttribute("hidden");
+            document.getElementsByTagName("p")[1].innerText = error.message;
+            if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[1].classList.add("text-danger");
+            document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            scrollTo(0, getSecondParagraph());
+            console.log(error);
+        }
+    );
+}
+
+async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, year) {
+    if (typeof(title) != "string" || typeof(genre) != "string") {
+        throw new TypeError("Parameters must be a string.");
+    }
+    if ((!(Number.isInteger(watchStatus)))) {
+        throw new TypeError("Watch status must be an integer.");
+    }
+    if (watchStatus < 0 || watchStatus > 2) {
+        throw new RangeError("Watch status must be from 0-2, inclusive.");
+    }
+    if ((!(Number.isInteger(year)))) {
+        throw new TypeError("year must be an integer.");
+    }
+    if (year < 1878 || year > 2025) {
+        throw new RangeError("year must be from 1878 (first motion picture release) to 2025 (current year), inclusive.");
+    }
+    var titleString = title;
+    titleString.trim();
+    titleString.replaceAll(" ", "+");
+    titleString.replaceAll(/[.,:?]/g, "%3A");
+    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full&y=${year}`).then(
+        (response) => response.json()
+    ).then(
+        (json) => {
+            console.log(json.Response);
+            if (json.Response == "True") {
+                console.log(json);
+                console.log(json.Director);
+                console.log(json.Plot);
+                console.log(json.Poster);
+                console.log(json.Year);
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, year)
                 if (Movie.findMovie(movies, newMovie) > -1)
                     throw new Error("This movie is already in the log. Please add a different one.");
                 movies.push(newMovie);
@@ -600,4 +690,36 @@ function addEventListenerToDropdownLink(dropdownLink, movie) {
         event.preventDefault();
         editWatchStatus(dropdownLink, movie);
     });
+}
+
+function stepUp() {
+    try {
+    if (document.getElementById("year").value == "")
+        document.getElementById("year").value = 1878;
+    else {
+        if (Number.parseInt(document.getElementById("year").value) >= 2025)
+            throw new RangeError("Year must not be greater than the current year.");
+        document.getElementById("year").value++;
+    }
+    }
+    catch (err) {
+        if (err instanceof RangeError)
+            document.getElementById("year").value = 1878;
+    }
+}
+
+function stepDown() {
+    try {
+        if (document.getElementById("year").value == "")
+            document.getElementById("year").value = 2025;
+        else {
+            if (Number.parseInt(document.getElementById("year").value) <= 1878)
+                throw new RangeError("Year must not be less than the year in which the first motion picture was released.");
+            document.getElementById("year").value--;
+        }
+        }
+        catch (err) {
+            if (err instanceof RangeError)
+                document.getElementById("year").value = 2025;
+        }
 }

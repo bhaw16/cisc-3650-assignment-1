@@ -83,7 +83,7 @@ class Movie {
         if (typeof(object) != "object") {
             throw new TypeError("object must be of type Object.");
         }
-        return object instanceof Movie && object.title == this.title && object.director == this.director;
+        return object instanceof Movie && object.title == this.title && this.year == object.year && object.director == this.director;
         //&& object.genre == this.genre && object.plot == this.plot && object.image == this.image;
     }
 
