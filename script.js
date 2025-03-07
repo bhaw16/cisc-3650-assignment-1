@@ -5,6 +5,8 @@ console.log(`Is movies an array? ${Array.isArray(movies)}`);
 console.log(document.getElementsByTagName("p"));
 var canAddMovie = true, canDeleteMovie = true, addingMovies = false, deletingMovies = false;
 var numAddClicks = 0;
+var showMovies = true, showRatings = false;
+var ratingData;
 loadMovies();
 console.log(document.getElementsByClassName("table-bordered")[0].style);
 var scrollToTop = document.createElement("button");
@@ -36,6 +38,9 @@ document.getElementById("add-movie").addEventListener("mouseup", (event) => {
     if (deletingMovies && !canDeleteMovie) {
         throw new Error("You cannot add a movie while you are deleting movies.");
     }
+    if (showRatings) {
+        throw new Error("You cannot add a movie to the log while you are viewing moie statistics.");
+    }
     try {
         if (canAddMovie && !addingMovies) {
             addingMovies = true;
@@ -55,7 +60,7 @@ document.getElementById("add-movie").addEventListener("mouseup", (event) => {
     catch(err) {
         canAddMovie = false;
         console.log(err.message);
-        if (err.message == "You cannot add a movie while you are deleting movies.") {
+        if (err.message == "You cannot add a movie while you are deleting movies." || err.message == "You cannot add a movie to the log while you are viewing moie statistics.") {
             document.getElementsByTagName("p")[0].removeAttribute("hidden");
             document.getElementsByTagName("p")[0].innerText = err.message;
             if ((!(document.getElementsByTagName("p")[0].classList.contains("text-danger"))))
@@ -72,6 +77,10 @@ document.getElementById("add-movie").addEventListener("mouseup", (event) => {
         }
     }
 });
+document.getElementById("show-ratings").addEventListener("mouseup", () => {
+    showMovies = !showMovies;
+    showRatings = !showRatings;
+});
 document.getElementById("add-movie").addEventListener("mouseover", () => {
     (canAddMovie) ? document.getElementById("add-movie").setAttribute("style", "cursor: pointer") : document.getElementById("add-movie").setAttribute("style", "cursor: not-allowed");
 });
@@ -80,6 +89,9 @@ document.getElementById("delete-movie").addEventListener("mouseover", () => {
 });
 document.getElementById("delete-movie").addEventListener("mouseup", () => {
     try {
+    if (showRatings) {
+        throw new Error("You cannot delete a movie from the log while you are viewing moie statistics.");
+    }
     if (addingMovies) {
         throw new Error("You cannot delete movies while adding one.");
     }
@@ -490,6 +502,7 @@ async function getMovieFromTitle(title, genre) {
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
                 console.log(Movie.avgRatingsByDirector(movies));
+                ratingData = Movie.avgRatingsByDirector(movies);
                 console.log("Watch status cells:");
                 console.log(document.getElementsByClassName("watch-status"));
             }
@@ -548,6 +561,8 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus, rating) 
                 movies.push(newMovie);
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
+                console.log(Movie.avgRatingsByDirector(movies));
+                ratingData = Movie.avgRatingsByDirector(movies);
                 document.getElementById("add-movie-form").remove();
             }
             else {
@@ -608,6 +623,8 @@ async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, yea
                 movies.push(newMovie);
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
+                console.log(Movie.avgRatingsByDirector(movies));
+                ratingData = Movie.avgRatingsByDirector(movies);
                 document.getElementById("add-movie-form").remove();
             }
             else {
@@ -737,6 +754,12 @@ setInterval(() => {
         document.getElementById("delete-movie").classList.remove("shadow-none");
         document.getElementById("delete-movie").removeAttribute("aria-disabled");
     }
+    if (showMovies && !showRatings) {
+        hideAvgRatings();
+    }
+    else {
+        showAvgRatings();
+    }
 }, 10);
 
 function deleteDropdown(dropdownDiv) {
@@ -850,18 +873,18 @@ function ratingDown() {
     }
 }
 
-function changeRatingButtons() {
-    
+function showAvgRatings() {
+    document.getElementById("show-ratings").innerText = "Show Movie Log";
+    document.getElementsByTagName("tbody")[1].innerHTML = "";
+    for (var i = 0; i < ratingData.length; i++) {
+        document.getElementsByTagName("tbody")[1].insertAdjacentHTML("beforeend", `<tr class=\"rating-row\"><td>${ratingData[i].dir}</td><td>${Number.parseFloat(ratingData[i].avgRating)}</td></tr>`);
+    }
+    document.getElementsByTagName("table")[0].setAttribute("hidden", "");
+    document.getElementsByTagName("table")[1].removeAttribute("hidden");
 }
 
-function groupByDirector() {
-    var directors = new Set();
-    for (var i = 0; i < movies.length; i++) {
-        for (var j = 0; j < movies[i].getDirectorList().director.length; j++) {
-            directors.add(movies[i].getDirectorList().director[j]);
-        }
-    }
-    for (var d of directors) {
-        
-    }
+function hideAvgRatings() {
+    document.getElementById("show-ratings").innerText = "Group Movies by Director";
+    document.getElementsByTagName("table")[1].setAttribute("hidden", "");
+    document.getElementsByTagName("table")[0].removeAttribute("hidden");
 }
