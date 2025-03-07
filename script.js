@@ -881,6 +881,7 @@ function ratingDown() {
 }
 
 function showAvgRatings() {
+    ratingData = Movie.avgRatingsByDirector(movies);
     document.getElementById("show-ratings").innerText = "Show Movie Log";
     document.getElementsByTagName("tbody")[1].innerHTML = "";
     for (var i = 0; i < ratingData.length; i++) {
