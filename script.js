@@ -39,7 +39,7 @@ document.getElementById("add-movie").addEventListener("mouseup", (event) => {
         throw new Error("You cannot add a movie while you are deleting movies.");
     }
     if (showRatings) {
-        throw new Error("You cannot add a movie to the log while you are viewing moie statistics.");
+        throw new Error("You cannot add a movie to the log while you are viewing movie statistics.");
     }
     try {
         if (canAddMovie && !addingMovies) {
@@ -90,7 +90,7 @@ document.getElementById("delete-movie").addEventListener("mouseover", () => {
 document.getElementById("delete-movie").addEventListener("mouseup", () => {
     try {
     if (showRatings) {
-        throw new Error("You cannot delete a movie from the log while you are viewing moie statistics.");
+        throw new Error("You cannot delete a movie from the log while you are viewing movie statistics.");
     }
     if (addingMovies) {
         throw new Error("You cannot delete movies while adding one.");
@@ -342,6 +342,8 @@ function displayMovieInTable(movie) {
         movieRow.insertAdjacentElement("beforeend", tableData);
     }
     document.getElementsByTagName("tbody")[0].insertAdjacentElement("beforeend", movieRow);
+    if (movie.watchStatus == 2)
+        sound.play();
 }
 
 function getMovieAttribute(movie, number) {
@@ -701,7 +703,7 @@ function deleteRowWithButton(button) {
     }
     button.addEventListener("mouseup", () => {
         console.log(index);
-        var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(button)) - 3;
+        var index = Number.parseInt(Array.from(document.getElementsByTagName("button")).indexOf(button)) - 4;   //there are 4 buttons on top so we need to exclude them
         var deletedMovie = Movie.getMovieAt(movies, index);
             delete movies[Movie.findMovie(movies, deletedMovie)];
             movies = movies.filter((movie) => {
@@ -794,6 +796,11 @@ function editWatchStatus(dropdownLink, movie) {
     movies[movieIndex] = movie;
     console.log(movies);
     document.getElementsByClassName("watch-status")[movieIndex].innerText = movie.getWatchStatusString();
+    if (movie.watchStatus == 2)
+        sound.play();
+    else
+        sound.pause();
+        sound.currentTime = 0.0;
 }
 
 function addEventListenerToDropdownLink(dropdownLink, movie) {
