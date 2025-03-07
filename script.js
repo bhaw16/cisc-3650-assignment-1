@@ -471,7 +471,7 @@ async function getMovieData(movie) {
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:!?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
+    await fetch(`https://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => console.log(json)
@@ -486,7 +486,7 @@ async function getMovieFromTitle(title, genre) {
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
+    await fetch(`https://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => {
@@ -546,7 +546,7 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus, rating) 
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
+    await fetch(`https://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full`).then(
         (response) => response.json()
     ).then(
         (json) => {
@@ -608,7 +608,7 @@ async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, yea
     titleString.trim();
     titleString.replaceAll(" ", "+");
     titleString.replaceAll(/[.,:?]/g, "%3A");
-    await fetch(`http://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full&y=${year}`).then(
+    await fetch(`https://www.omdbapi.com/?apikey=ad3c3cc5&t=${titleString}&type=movie&plot=full&y=${year}`).then(
         (response) => response.json()
     ).then(
         (json) => {
