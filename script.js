@@ -489,6 +489,7 @@ async function getMovieFromTitle(title, genre) {
                 movies.push(newMovie);
                 console.log(movies);
                 displayMovieInTable(movies[movies.length - 1]);
+                console.log(Movie.avgRatingsByDirector(movies));
                 console.log("Watch status cells:");
                 console.log(document.getElementsByClassName("watch-status"));
             }
