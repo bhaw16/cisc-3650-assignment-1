@@ -726,7 +726,7 @@ setInterval(() => {
         }
         document.getElementById("delete-movie").innerText = "Delete Movies";
     }
-    if (numAddClicks > 0 && !canAddMovie) {
+    if ((numAddClicks > 0 && !canAddMovie) || showRatings) {
         //document.getElementById("add-movie").classList.remove("btn-dark");
         //document.getElementById("add-movie").setAttribute("disabled", "");
         document.getElementById("add-movie").classList.add("disabled");
@@ -741,7 +741,7 @@ setInterval(() => {
         document.getElementById("add-movie").classList.remove("shadow-none");
         document.getElementById("add-movie").removeAttribute("aria-disabled");
     }
-    if (!canDeleteMovie && !deletingMovies) {
+    if ((!canDeleteMovie && !deletingMovies) || showRatings) {
         //document.getElementById("delete-movie").classList.remove("btn-dark");
         //document.getElementById("delete-movie").setAttribute("disabled", "");
         document.getElementById("delete-movie").classList.add("disabled");
