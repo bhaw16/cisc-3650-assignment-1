@@ -308,6 +308,9 @@ function displayMovieInTable(movie) {
                                     movies[movies.indexOf(movie)].rating = 1;
                                     thisCell.innerText = "⭐️";
                             }
+                            finally {
+                                ratingData = Movie.avgRatingsByDirector(movies);
+                            }
                         });
                     document.getElementById("dec-rating").addEventListener("mouseup", () => {
                         try {
@@ -326,6 +329,9 @@ function displayMovieInTable(movie) {
                             if (err instanceof RangeError)
                                 movies[movies.indexOf(movie)].rating = 5;
                                 thisCell.innerText = "⭐️⭐️⭐️⭐️⭐️";
+                        }
+                        finally {
+                            ratingData = Movie.avgRatingsByDirector(movies);
                         }
                     });
                 }
