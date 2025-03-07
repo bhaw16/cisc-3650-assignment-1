@@ -39,6 +39,18 @@ label {
     margin-bottom: 2vh;
 }
 
+#year {
+    display: inline;
+}
+
+#step-up {
+    display: inline;
+}
+
+#step-down {
+    display: block;
+}
+
 /*button:disabled {
     cursor: not-allowed;
     pointer-events: all !important;

@@ -113,11 +113,12 @@ document.getElementById("delete-movie").addEventListener("mouseup", () => {
     }
 });
 document.getElementById("movie-form").addEventListener("submit", (event) => {
+    try {
     event.preventDefault();
     for (var i = 0; i < document.getElementsByTagName("p").length; i++) {
         document.getElementsByTagName("p")[i].setAttribute("hidden", "");
     }
-    var title, year, genre, watchStatus;
+    var title, year, genre, watchStatus, rating;
     if (document.getElementById("title").value == "") 
         throw new Error("You must enter a title.");
     else 
@@ -133,10 +134,15 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     }
     if (watchStatus == undefined)
         throw new Error("You must specify a watch status.");
+    if (document.getElementById("rating").value == "") {
+        throw new Error("You must specify a rating.");
+    }
+    else
+        rating = Number.parseInt(document.getElementById("rating").value);
     if (document.getElementById("year").value != "")
         year = Number.parseInt(document.getElementById("year").value);
     if (year == undefined) {
-        getMovieFromTitle_WatchStatus(title, genre, watchStatus).then(() => {
+        getMovieFromTitle_WatchStatus(title, genre, watchStatus, rating).then(() => {
     //document.getElementById("add-movie-form").remove();
     canAddMovie = true;
     addingMovies = false;
@@ -154,7 +160,7 @@ document.getElementById("movie-form").addEventListener("submit", (event) => {
     })
 }
 else {
-    getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, year).then(() => {
+    getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, year, rating).then(() => {
         //document.getElementById("add-movie-form").remove();
         canAddMovie = true;
         addingMovies = false;
@@ -171,9 +177,18 @@ else {
             scrollTo(0, getSecondParagraph());
 })
 }
-});
+}
+catch(err) {
+    console.log(err.message);
+            document.getElementsByTagName("p")[1].removeAttribute("hidden");
+            document.getElementsByTagName("p")[1].innerText = err.message;
+            if ((!(document.getElementsByTagName("p")[1].classList.contains("text-danger"))))
+                document.getElementsByTagName("p")[1].classList.add("text-danger");
+            document.getElementsByTagName("p")[0].setAttribute("hidden", "");
+            scrollTo(0, getSecondParagraph());
+}
 console.log("Watch status cells:");
-console.log(document.getElementsByClassName("watch-status"));
+console.log(document.getElementsByClassName("watch-status"));});
 /*for (var i = 0; i < document.getElementsByClassName("watch-status").length; i++) {
     var cell = document.getElementsByClassName("watch-status")[i];
     cell.addEventListener("mouseenter", () => {
@@ -206,10 +221,10 @@ function displayMovieInTable(movie) {
     }
     var movieRow = document.createElement("tr");
     movieRow.className = "movie-rows";
-    for (var i = 0; i < 7; i++) {
+    for (var i = 0; i < 8; i++) {
         var tableData = document.createElement("td");
         console.log(`movie-${movies.indexOf(movie)}`);
-        (i == 6) ? tableData.className = "watch-status" : tableData.className = `movie-${movies.indexOf(movie)}`;
+        (i == 6) ? tableData.className = "watch-status" : ((i == 7) ? tableData.className = "star-rating" : tableData.className = `movie-${movies.indexOf(movie)}`);
         if (i == 6) {
         tableData.addEventListener("mouseenter", () => {
             if (!deletingMovies) {
@@ -246,13 +261,67 @@ function displayMovieInTable(movie) {
                 console.log(dropdown);
                 console.log(dropdownDiv);
                 dropdownDiv.insertAdjacentElement("beforeend", dropdown);
-                tableData.insertAdjacentElement("beforeend", dropdownDiv);
+                document.getElementsByClassName("watch-status")[movies.indexOf(movie)].insertAdjacentElement("beforeend", dropdownDiv);
                 console.log(tableData);
             }
         });
         tableData.addEventListener("mouseleave", () => {
             deleteDropdown(document.getElementById("watch-status-dropdown"));
         });
+        }
+        if (i == 7) {
+            tableData.addEventListener("mouseenter", () => {
+                if (!deletingMovies) {
+                    console.log(document.getElementsByClassName("star-rating"));
+                    //console.log(document.getElementsByClassName("star-rating").innerHTML);
+                    tableData.insertAdjacentHTML("afterbegin", "<button class=\"btn btn-dark\" id=\"inc-rating\">‸</button");
+                    tableData.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"dec-rating\">˯</button>");
+                    console.log(document.getElementsByClassName("star-rating"));
+                    //console.log(document.getElementsByClassName("star-rating").innerHTML);
+                    document.getElementById("inc-rating").addEventListener("mouseup", () => {
+                        try {
+                            var thisCell = document.getElementsByClassName("star-rating")[movies.indexOf(movie)];
+                            console.log(thisCell.innerText);
+                            console.log(thisCell.innerHTML);
+                            var oldString = thisCell.innerText.trim();
+                            if (oldString.length / 2 > 5)
+                                throw new RangeError();
+                            console.log(`${oldString} length: ${oldString.length}`);
+                            movie.setValueFromRatingString(oldString.concat("⭐️"));
+                            movies[movies.indexOf(movie)] = movie;
+                            thisCell.innerText = Movie.getStaticRatingString(movie.rating);
+                            }
+                            catch(err) {
+                                if (err instanceof RangeError && err.message == "")
+                                    movies[movies.indexOf(movie)].rating = 1;
+                                    thisCell.innerText = "⭐️";
+                            }
+                        });
+                    document.getElementById("dec-rating").addEventListener("mouseup", () => {
+                        try {
+                        var thisCell = document.getElementsByClassName("star-rating")[movies.indexOf(movie)];
+                        console.log(thisCell.innerText);
+                        console.log(thisCell.innerHTML);
+                        var oldString = (thisCell.innerText.substring(1, thisCell.innerText.length - 2));
+                        if (oldString.length < 1)
+                            throw new RangeError();
+                        console.log(`${oldString} length: ${oldString.length}`);
+                        movie.setValueFromRatingString(oldString);
+                        movies[movies.indexOf(movie)] = movie;
+                        thisCell.innerText = Movie.getStaticRatingString(movie.rating);
+                        }
+                        catch(err) {
+                            if (err instanceof RangeError)
+                                movies[movies.indexOf(movie)].rating = 5;
+                                thisCell.innerText = "⭐️⭐️⭐️⭐️⭐️";
+                        }
+                    });
+                }
+            });
+            tableData.addEventListener("mouseleave", () => {
+                document.getElementById("inc-rating").remove();
+                document.getElementById("dec-rating").remove();
+            });
         }
         var movieAttributeData = getMovieAttribute(movie, i);
         console.log(movieAttributeData);
@@ -282,8 +351,10 @@ function getMovieAttribute(movie, number) {
             //return movie.hyperlink;
         case 5:
             return movie.image;
-        default:
+        case 6:
             return movie.getWatchStatusString();
+        default:
+            return movie.getRatingString();
     }
 }
 
@@ -291,15 +362,19 @@ function addMovieForm() {
     if (!canAddMovie && addingMovies) {
     var newRow = document.createElement("tr");
     newRow.id = "add-movie-form";
-    for (var i = 0; i < 8; i++) {
+    for (var i = 0; i < 9; i++) {
         var formCell = document.createElement("td");
-        if (i < 3) {
-            var textId = (i == 0) ? "title" : ((i == 1) ? "year" : "genre");
-            var inputType = (textId == "year") ? "tel" : "text";
+        if (i < 3 || i == 7) {
+            var textId = (i == 0) ? "title" : ((i == 1) ? "year" : ((i == 7) ? "rating": "genre"));
+            var inputType = (textId == "year" || textId == "rating") ? "tel" : "text";
             formCell.insertAdjacentHTML("beforeend", `<input type=\"${inputType}\" id=\"${textId}\" form=\"movie-form\">`);
             if (i == 1) {
                 formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"step-up\">‸</button>");
                 formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"step-down\">˯</button>");
+            }
+            if (i == 7) {
+                formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"rating-up\">‸</button>");
+                formCell.insertAdjacentHTML("beforeend", "<button class=\"btn btn-dark\" id=\"rating-down\">˯</button>");
             }
             /*
             var cellInput = document.createElement("input");
@@ -323,7 +398,7 @@ function addMovieForm() {
                 */
             }
         }
-        else if (i == 7) {
+        else if (i == 8) {
             formCell.insertAdjacentHTML("beforeend", "<input class=\"btn btn-dark\" type=\"submit\" form=\"movie-form\">");
             /*
             var cellInput = document.createElement("input");
@@ -339,6 +414,12 @@ function addMovieForm() {
     });
     document.getElementById("step-down").addEventListener("mouseup", () => {
         stepDown();
+    });
+    document.getElementById("rating-up").addEventListener("mouseup", () => {
+        ratingUp();
+    });
+    document.getElementById("rating-down").addEventListener("mouseup", () => {
+        ratingDown();
     });
     scrollTo(0, getFormX());
     //document.getElementById("year").removeAttribute("step");
@@ -402,7 +483,7 @@ async function getMovieFromTitle(title, genre) {
                 console.log(json.Plot);
                 console.log(json.Poster);
                 console.log(json.Year);
-                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, 0, Number.parseInt(json.Year))
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, 0, Number.parseInt(json.Year), 5)
                 if (Movie.findMovie(movies, newMovie) > -1)
                     throw new Error("This movie is already in the log. Please add a different one.");
                 movies.push(newMovie);
@@ -429,7 +510,7 @@ async function getMovieFromTitle(title, genre) {
     );
 }
 
-async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
+async function getMovieFromTitle_WatchStatus(title, genre, watchStatus, rating) {
     if (typeof(title) != "string" || typeof(genre) != "string") {
         throw new TypeError("Parameters must be a string.");
     }
@@ -438,6 +519,12 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
     }
     if (watchStatus < 0 || watchStatus > 2) {
         throw new RangeError("Watch status must be from 0-2, inclusive.");
+    }
+    if ((!(Number.isInteger(rating)))) {
+        throw new TypeError("Rating must be an integer.");
+    }
+    if (rating < 1 || rating > 5) {
+        throw new RangeError("Rating must be from 1-5, inclusive.");
     }
     var titleString = title;
     titleString.trim();
@@ -454,7 +541,7 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
                 console.log(json.Plot);
                 console.log(json.Poster);
                 console.log(json.Year);
-                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, Number.parseInt(json.Year))
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, Number.parseInt(json.Year), rating)
                 if (Movie.findMovie(movies, newMovie) > -1)
                     throw new Error("This movie is already in the log. Please add a different one.");
                 movies.push(newMovie);
@@ -480,7 +567,7 @@ async function getMovieFromTitle_WatchStatus(title, genre, watchStatus) {
     );
 }
 
-async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, year) {
+async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, year, rating) {
     if (typeof(title) != "string" || typeof(genre) != "string") {
         throw new TypeError("Parameters must be a string.");
     }
@@ -495,6 +582,9 @@ async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, yea
     }
     if (year < 1878 || year > 2025) {
         throw new RangeError("year must be from 1878 (first motion picture release) to 2025 (current year), inclusive.");
+    }
+    if (rating < 1 || rating > 5) {
+        throw new RangeError("Rating must be from 1-5, inclusive.");
     }
     var titleString = title;
     titleString.trim();
@@ -511,7 +601,7 @@ async function getMovieFromTitle_WatchStatus_Year(title, genre, watchStatus, yea
                 console.log(json.Plot);
                 console.log(json.Poster);
                 console.log(json.Year);
-                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, year)
+                var newMovie = new Movie(title, genre, json.Director, json.Plot, json.Poster, watchStatus, year, rating)
                 if (Movie.findMovie(movies, newMovie) > -1)
                     throw new Error("This movie is already in the log. Please add a different one.");
                 movies.push(newMovie);
@@ -725,6 +815,42 @@ function stepDown() {
             if (err instanceof RangeError)
                 document.getElementById("year").value = 2025;
         }
+}
+
+function ratingUp() {
+    try {
+        if (document.getElementById("rating").value == "")
+            document.getElementById("rating").value = 1;
+        else {
+            if (Number.parseInt(document.getElementById("rating").value) >= 5)
+                throw new RangeError("Rating cannot be greater than 5.");
+            document.getElementById("rating").value++;
+        }
+    }
+    catch(err) {
+        if (err instanceof RangeError)
+            document.getElementById("rating").value = 1;
+    }
+}
+
+function ratingDown() {
+    try {
+        if (document.getElementById("rating").value == "")
+            document.getElementById("rating").value = 5;
+        else {
+            if (Number.parseInt(document.getElementById("rating").value) <= 1)
+                throw new RangeError("Rating cannot be less than 1.");
+            document.getElementById("rating").value--;
+        }
+    }
+    catch(err) {
+        if (err instanceof RangeError)
+            document.getElementById("rating").value = 5;
+    }
+}
+
+function changeRatingButtons() {
+    
 }
 
 function groupByDirector() {

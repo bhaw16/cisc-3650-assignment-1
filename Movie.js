@@ -1,5 +1,5 @@
 class Movie {
-    constructor(title, genre, director, /*moreInfoLink,*/ plot, poster, watchStatus, year) {
+    constructor(title, genre, director, /*moreInfoLink,*/ plot, poster, watchStatus, year, rating) {
         if (typeof(title) != "string" || typeof(genre) != "string"
         || typeof(director) != "string"/* || typeof(moreInfoLink) != "string"*/
         || typeof(plot) != "string" || typeof(poster) != "string") {
@@ -17,6 +17,12 @@ class Movie {
         if (year < 1878 || year > 2025) {
             throw new RangeError("The year must be from 1878 (first motion picture release) to 2025 (current year), inclusive.");
         }
+        if ((!(Number.isInteger(rating)))) {
+            throw new TypeError("rating must be an integer.");
+        }
+        if (rating < 1 || rating > 5) {
+            throw new RangeError("rating must be from 1-5, inclusive.");
+        }
         this.title = title;
         this.genre = genre;
         this.director = director;
@@ -29,7 +35,7 @@ class Movie {
         this.image.src = poster;
         this.image.alt = `Poster of the movie ${title}`;
         this.year = year;
-        this.rating = 0;
+        this.rating = rating;
     }
 
     getWatchStatusString() {
@@ -60,6 +66,28 @@ class Movie {
         }
     }
 
+    getRatingString() {
+        var ratingString = "";
+        for (var i = 0; i < this.rating; i++) {
+            ratingString = ratingString.concat("⭐️");
+        }
+        return ratingString;
+    }
+
+    static getStaticRatingString(rating) {
+        var ratingString = "";
+        if ((!(Number.isInteger(rating)))) {
+            throw new TypeError("rating must be an integer.");
+        }
+        if (rating < 1 || rating > 5) {
+            throw new RangeError("rating must be from 1-5, inclusive.");
+        }
+        for (var i = 0; i < rating; i ++) {
+            ratingString = ratingString.concat("⭐️");
+        }
+        return ratingString;
+    }
+
     setValueFromWatchStatusString(watchStatusString) {
         if (typeof(watchStatusString) != "string") {
             throw new TypeError("watchStatusString must be a string.");
@@ -77,6 +105,31 @@ class Movie {
             default:
                 throw new Error("Invalid string.");
         }
+    }
+
+    setValueFromRatingString(ratingString) {
+        if (typeof(ratingString) != "string") {
+            throw new TypeError("ratingString must be a string.");
+        }
+        var ratingNum = (ratingString.match(/⭐️/g) || []).length;
+        console.log(ratingNum);
+        //⭐️ emoji is 2 units instead of 1 as explained by ChatGPT
+        if (ratingNum < 1 || ratingNum > 5) {
+            throw new Error("ratingString must have 1-5 stars.");
+        }
+        /*find all occurrences of ⭐️ and return either an empty array if no
+        matches are found or an array with all occurrences of ⭐️ then get the length of array
+        to get the length of the rating string*/
+        /*
+        for (var i = 0; i < ratingString.length; i++) {
+            if (ratingString.substring(i, i + 2) != "⭐️") {
+                throw new Error("ratingString must only have stars.");
+            }
+            else {
+                ratingNum++;
+            }
+        }*/
+        this.rating = ratingNum;
     }
 
     equals(object) {
